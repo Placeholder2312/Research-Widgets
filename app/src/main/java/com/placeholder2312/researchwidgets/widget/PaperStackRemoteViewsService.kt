@@ -25,7 +25,7 @@ class PaperStackRemoteViewsService:RemoteViewsService(){
    val opts=AppWidgetManager.getInstance(this@PaperStackRemoteViewsService).getAppWidgetOptions(widgetId)
    val width=opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH,280);val height=opts.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,64)
    v.setTextViewTextSize(R.id.paper_title,TypedValue.COMPLEX_UNIT_SP,if(width>=360&&height>=90)18f else if(width<270)14f else 16f)
-   v.setTextViewTextSize(R.id.paper_byline,TypedValue.COMPLEX_UNIT_SP,if(height<64)9f else 10f)
+   v.setTextViewTextSize(R.id.paper_byline,TypedValue.COMPLEX_UNIT_SP,if(height<64)8f else 10f)
    v.setContentDescription(R.id.paper_card,"${p.title}. $byline. Open in Aftergleam.")
    v.setOnClickFillInIntent(R.id.paper_card,Intent().putExtra(AftergleamContract.EXTRA_PAPER_ID,p.id))
    return v
