@@ -34,3 +34,14 @@ Install the customized Aftergleam fork before Research Widgets so Android knows 
 ## Current status
 
 Native app scaffold, provider client, widgets, per-instance settings and refresh receiver are in place on the feature branch. APK build, two-app permission verification, emulator testing and Samsung One UI gesture testing remain pending until CI/device build results are available.
+
+## Optional CI signing for cross-app IPC
+
+To make the GitHub Actions debug APK use the same certificate as Aftergleam, add these four Actions secrets to **both repositories** with identical values:
+
+- `RESEARCH_WIDGETS_KEYSTORE_BASE64`: base64 encoding of the private `.jks` keystore file (the key itself is never committed)
+- `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`
+- `RESEARCH_WIDGETS_KEY_ALIAS`
+- `RESEARCH_WIDGETS_KEY_PASSWORD`
+
+When the base64 secret is present, CI decodes the keystore into the temporary runner directory and signs the debug APK with it. Without these secrets, CI still builds a debug APK using that repository's generated debug key, which is suitable for build validation but **cannot pass signature-level IPC** with the other app.
