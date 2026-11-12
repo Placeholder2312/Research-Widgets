@@ -33,7 +33,7 @@ Install the customized Aftergleam fork before Research Widgets so Android knows 
 
 ## Current status
 
-Native app scaffold, provider client, widgets, per-instance settings and refresh receiver are in place on the feature branch. APK build, two-app permission verification, emulator testing and Samsung One UI gesture testing remain pending until CI/device build results are available.
+The native app, provider client, both widgets, per-instance configuration, protected refresh receiver, boot/app-replacement refresh, and widget-ID restore handling are on the feature branch. CI has successfully run `testDebugUnitTest` and `assembleDebug`; the latest CI APK uses the runner's default debug key unless the shared-keystore secrets above are configured. Real two-app signature-permission testing, emulator interaction tests and Samsung One UI gesture testing remain pending.
 
 ## Optional CI signing for cross-app IPC
 
