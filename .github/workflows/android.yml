@@ -16,7 +16,10 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-37'
       - name: Build and test
         run: ./gradlew --no-daemon testDebugUnitTest assembleDebug
       - name: Upload debug APK
