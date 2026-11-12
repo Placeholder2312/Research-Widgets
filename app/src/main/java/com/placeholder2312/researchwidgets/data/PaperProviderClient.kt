@@ -15,7 +15,12 @@ object PaperProviderClient {
  @Suppress("DEPRECATION")
  private fun resolveLegacy(context:Context)=context.packageManager.resolveContentProvider(AftergleamContract.AUTHORITY,0)
  fun read(context:Context,mode:FeedMode):FeedRead {
-  val provider=if(Build.VERSION.SDK_INT>=33)context.packageManager.resolveContentProvider(AftergleamContract.AUTHORITY,PackageManager.ComponentInfoFlags.of(0L)) else resolveLegacy(context)
+  val provider=try {
+   if(Build.VERSION.SDK_INT>=33)context.packageManager.resolveContentProvider(AftergleamContract.AUTHORITY,PackageManager.ComponentInfoFlags.of(0L)) else resolveLegacy(context)
+  } catch(e:Exception) {
+   Log.w(TAG,"Unable to check whether the Aftergleam provider is installed",e)
+   return FeedRead(ProviderState.UNAVAILABLE,"Could not check Aftergleam availability. Open both apps and try again.")
+  }
   if(provider==null)return FeedRead(ProviderState.NOT_INSTALLED,"Install the customized Aftergleam fork to connect.")
   val uri=if(mode==FeedMode.RECOMMENDED)AftergleamContract.RECOMMENDED_URI else AftergleamContract.SAVED_URI
   return try {

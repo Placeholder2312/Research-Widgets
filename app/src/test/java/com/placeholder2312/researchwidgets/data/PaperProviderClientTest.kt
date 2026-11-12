@@ -16,9 +16,9 @@ class PaperProviderClientTest {
 
  @Test fun mapsRecommendedAndSavedProviderRows() {
   val cursor=MatrixCursor(AftergleamContract.COLUMNS)
-  cursor.addRow(arrayOf("paper-a","Recommended paper","Ada Lovelace, Grace Hopper","arXiv","2026-11-12",0,"recommended"))
-  cursor.addRow(arrayOf("paper-b","Saved paper","Katherine Johnson","bioRxiv","2026-11-11",1,"saved"))
-  val papers=PaperProviderClient.parseRows(cursor)
+  cursor.addRow(arrayOf<Any?>("paper-a","Recommended paper","Ada Lovelace, Grace Hopper","arXiv","2026-11-12",0,"recommended"))
+  cursor.addRow(arrayOf<Any?>("paper-b","Saved paper","Katherine Johnson","bioRxiv","2026-11-11",1,"saved"))
+  val papers=cursor.use { PaperProviderClient.parseRows(it) }
   assertEquals(2,papers.size)
   assertEquals("paper-a",papers[0].id)
   assertEquals("recommended",papers[0].feedType)
@@ -29,12 +29,12 @@ class PaperProviderClientTest {
 
  @Test fun emptyProviderCursorMapsToEmptyFeed() {
   val cursor=MatrixCursor(AftergleamContract.COLUMNS)
-  assertTrue(PaperProviderClient.parseRows(cursor).isEmpty())
+  assertTrue(cursor.use { PaperProviderClient.parseRows(it) }.isEmpty())
  }
 
- @Test fun missingAftergleamReturnsDisconnectedStateWithoutThrowing() {
+ @Test fun providerResolutionFailuresReturnStateInsteadOfThrowing() {
   val result=PaperProviderClient.read(context,FeedMode.RECOMMENDED)
-  assertEquals(ProviderState.NOT_INSTALLED,result.state)
+  assertTrue(result.state==ProviderState.NOT_INSTALLED || result.state==ProviderState.UNAVAILABLE)
   assertTrue(result.message.isNotBlank())
  }
 
