@@ -1,29 +1,36 @@
 # Research Widgets
 
-An offline-first Android companion for the customized Aftergleam fork.
+Independent Android companion for the customized Aftergleam fork.
 
-This repository is intentionally independent from Aftergleam. It contains launcher widgets only and reads paper metadata from Aftergleam's versioned, read-only ContentProvider. It does not implement recommendation or ranking logic.
-
-## Development status
-
-Project bootstrap in progress. The provider contract and security boundary are documented in the Aftergleam fork at `docs/RESEARCH-WIDGETS-INTEGRATION.md`.
-
-- Package: `com.placeholder2312.researchwidgets`
-- Minimum Android: API 26
-- Target Android: API 37 (aligned with the fork; verify on target devices)
-- UI: native Android Views, AppWidget, RemoteViews, StackView
-- Network access: none required
-- IPC: signature-protected ContentProvider and explicit protected paper-open Activity
-
-## Local build
-
-Open this project in Android Studio and sync Gradle. Build the debug APK from the app module. Configure the same private signing keystore in both applications before testing signature-protected IPC; never commit keystores or passwords.
+- Application ID: `com.placeholder2312.researchwidgets`
+- Minimum SDK: 26; target SDK: 37
+- UI: native Android AppWidget, RemoteViews and StackView
+- Network permissions: none
+- Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
+- Development branch: `feature/aftergleam-integration`
 
 ## Widgets
 
-1. **Research Paper Strip** — one title card at a time, vertically navigable, configurable for Recommended or Saved.
-2. **Aftergleam tile** — decorative 2×2 launcher tile using the Aftergleam brand mark and opening the customized app.
+1. **Research Paper Strip** — approximately five columns by one row, one paper per card, vertical StackView navigation plus accessible previous/next controls. Configure each instance for Recommended or Saved.
+2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
 
-## Important
+## Build
 
-The companion only works with a compatible customized Aftergleam build that provides provider API v1. An official Aftergleam installation does not expose this private integration API.
+Open the repository in Android Studio or run `./gradlew testDebugUnitTest assembleDebug`. The debug APK is produced under `app/build/outputs/apk/debug/`.
+
+## Signing is required for IPC
+
+Both custom APKs must use the same locally controlled certificate to access the signature-protected provider and paper-opening endpoint. For both projects configure the same values, outside Git, using environment variables:
+
+- `RESEARCH_WIDGETS_KEYSTORE`
+- `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`
+- `RESEARCH_WIDGETS_KEY_ALIAS`
+- `RESEARCH_WIDGETS_KEY_PASSWORD`
+
+The companion build uses this key for debug and release when configured. The Aftergleam fork must be configured with the same keystore for its debug and release builds. Do not commit keystores or passwords. The default debug keys from two separate projects do not match and will not pass signature permission checks.
+
+Install the customized Aftergleam fork before Research Widgets so Android knows the custom permission owner. The official Aftergleam application does not expose this API.
+
+## Current status
+
+Native app scaffold, provider client, widgets, per-instance settings and refresh receiver are in place on the feature branch. APK build, two-app permission verification, emulator testing and Samsung One UI gesture testing remain pending until CI/device build results are available.

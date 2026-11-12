@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="24dp">
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Research Widgets" android:textSize="26sp" android:textStyle="bold"/>
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="A local companion for your customized Aftergleam installation. Add both widgets from your launcher’s widget picker." android:textSize="15sp"/>
+  <TextView android:id="@+id/connection_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:padding="16dp" android:background="@drawable/widget_paper_background" android:text="Checking Aftergleam…" android:textSize="14sp"/>
+  <Button android:id="@+id/check_connection" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Check connection"/>
+  <Button android:id="@+id/refresh_widgets" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Refresh widgets"/>
+  <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="No account, server, analytics or network access. Paper metadata stays on this device." android:textSize="13sp"/>
+ </LinearLayout>
+</ScrollView>
