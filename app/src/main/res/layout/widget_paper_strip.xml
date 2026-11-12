@@ -1,8 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/widget_paper_background" android:padding="4dp">
- <StackView android:id="@+id/paper_stack" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false"/>
- <TextView android:id="@+id/empty_text" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:padding="12dp" android:text="No papers" android:textColor="#483C35" android:textSize="12sp" android:background="@drawable/widget_paper_background"/>
- <TextView android:id="@+id/mode_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="top|end" android:paddingStart="8dp" android:paddingEnd="8dp" android:paddingTop="2dp" android:paddingBottom="2dp" android:text="Recommended" android:textColor="#735E50" android:textSize="10sp"/>
- <TextView android:id="@+id/previous_button" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center_vertical|start" android:background="@drawable/widget_control_background" android:gravity="center" android:text="‹" android:textColor="#483C35" android:textSize="22sp" android:contentDescription="Previous paper" android:clickable="true" android:focusable="true"/>
- <TextView android:id="@+id/next_button" android:layout_width="28dp" android:layout_height="28dp" android:layout_gravity="center_vertical|end" android:background="@drawable/widget_control_background" android:gravity="center" android:text="›" android:textColor="#483C35" android:textSize="22sp" android:contentDescription="Next paper" android:clickable="true" android:focusable="true"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nothing_card_bg">
+
+    <StackView
+        android:id="@+id/paper_stack"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false" />
+
+    <LinearLayout
+        android:id="@+id/empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/nothing_card_bg"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/empty_dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_red" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/empty_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:letterSpacing="0.1"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:padding="10dp"
+            android:text="NO PAPERS"
+            android:textColor="@color/nothing_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/previous_button"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center_vertical|start"
+        android:layout_marginStart="6dp"
+        android:clickable="true"
+        android:contentDescription="Previous paper"
+        android:focusable="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/nothing_chevron_previous" />
+
+    <ImageView
+        android:id="@+id/next_button"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center_vertical|end"
+        android:layout_marginEnd="6dp"
+        android:clickable="true"
+        android:contentDescription="Next paper"
+        android:focusable="true"
+        android:scaleType="fitCenter"
+        android:src="@drawable/nothing_chevron_next" />
 </FrameLayout>

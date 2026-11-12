@@ -62,6 +62,9 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         private const val ACTION_NEXT = "com.placeholder2312.researchwidgets.action.PAPER_NEXT"
         private const val ACTION_PREVIOUS = "com.placeholder2312.researchwidgets.action.PAPER_PREVIOUS"
 
+        /** Below this size the previous/next buttons are hidden and the card uses tighter padding. */
+        internal fun isCompact(widthDp: Int, heightDp: Int): Boolean = widthDp < 210 || heightDp < 52
+
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, PaperStripWidgetProvider::class.java))
@@ -78,22 +81,21 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             val mode = WidgetPreferences.mode(context, id)
             val result = PaperProviderClient.read(context, mode)
             val views = RemoteViews(context.packageName, R.layout.widget_paper_strip)
-            views.setTextViewText(R.id.mode_label, mode.label)
-            views.setTextViewText(R.id.empty_text, if (!result.connected || result.papers.isEmpty()) result.message else "")
+            views.setTextViewText(
+                R.id.empty_text,
+                if (!result.connected || result.papers.isEmpty()) result.message.uppercase() else ""
+            )
 
             val options = manager.getAppWidgetOptions(id)
             val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 280).coerceAtLeast(1)
             val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
-            val compact = width < 210 || height < 52
-            val showModeLabel = width >= 160 && height >= 60
+            val compact = isCompact(width, height)
 
             views.setViewVisibility(R.id.previous_button, if (compact) View.GONE else View.VISIBLE)
             views.setViewVisibility(R.id.next_button, if (compact) View.GONE else View.VISIBLE)
-            views.setViewVisibility(R.id.mode_label, if (showModeLabel) View.VISIBLE else View.GONE)
-            views.setTextViewTextSize(
-                R.id.mode_label,
-                android.util.TypedValue.COMPLEX_UNIT_SP,
-                if (width < 270) 9f else 10f
+            views.setViewVisibility(
+                R.id.empty_dots,
+                if (width >= 120 && height >= 64) View.VISIBLE else View.GONE
             )
 
             val density = context.resources.displayMetrics.density
@@ -110,7 +112,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }
             views.setRemoteAdapter(R.id.paper_stack, service)
-            views.setEmptyView(R.id.paper_stack, R.id.empty_text)
+            views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
             val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
                 ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)

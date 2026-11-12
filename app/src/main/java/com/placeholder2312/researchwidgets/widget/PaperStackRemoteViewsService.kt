@@ -49,26 +49,29 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
             val views = RemoteViews(packageName, R.layout.widget_paper_card)
             views.setTextViewText(R.id.paper_title, paper.title)
 
+            // The byline is no longer shown, but stays in the accessibility description.
             val byline = listOf(paper.source, paper.authors, paper.published)
                 .filter { it.isNotBlank() }
                 .joinToString(" · ")
-            views.setTextViewText(R.id.paper_byline, byline)
 
             val options = AppWidgetManager.getInstance(this@PaperStackRemoteViewsService)
                 .getAppWidgetOptions(widgetId)
             val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 280).coerceAtLeast(1)
             val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
+            val compact = PaperStripWidgetProvider.isCompact(width, height)
 
-            val horizontalPaddingDp = when {
-                width < 120 -> 4
-                width < 180 -> 8
-                width < 270 -> 14
-                else -> 22
+            // With the chevron buttons visible, leave room for them on both sides.
+            val horizontalPaddingDp = if (!compact) {
+                40
+            } else when {
+                width < 120 -> 6
+                width < 180 -> 10
+                else -> 14
             }
             val verticalPaddingDp = when {
-                height < 48 -> 1
-                height < 72 -> 2
-                else -> 3
+                height < 48 -> 2
+                height < 72 -> 3
+                else -> 6
             }
             val density = resources.displayMetrics.density
             val horizontalPaddingPx = (horizontalPaddingDp * density).toInt()
@@ -81,29 +84,52 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
                 verticalPaddingPx
             )
 
-            val titleSize = when {
+            val baseTitleSize = when {
                 width < 120 -> 11f
                 width < 180 -> 12f
                 width < 270 -> 14f
+                width >= 360 && height >= 140 -> 22f
                 width >= 360 && height >= 90 -> 18f
                 else -> 16f
             }
+            // Short strips also hold the dot row, so keep two title lines plus dots inside the height.
+            val titleSize = if (height < 72) minOf(baseTitleSize, 14f) else baseTitleSize
             views.setTextViewTextSize(R.id.paper_title, TypedValue.COMPLEX_UNIT_SP, titleSize)
 
-            val showByline = width >= 150 && height >= 64 && byline.isNotBlank()
-            views.setViewVisibility(R.id.paper_byline, if (showByline) View.VISIBLE else View.GONE)
-            views.setTextViewTextSize(
-                R.id.paper_byline,
-                TypedValue.COMPLEX_UNIT_SP,
-                if (width < 220 || height < 72) 8f else 10f
-            )
+            val count = papers.size
+            val showDots = count > 1 && height >= 56
+            views.setViewVisibility(R.id.dot_row, if (showDots) View.VISIBLE else View.GONE)
+            if (showDots) bindDots(views, position, count)
 
-            views.setContentDescription(R.id.paper_card, "${paper.title}. $byline. Open in Aftergleam.")
+            val description = listOf(
+                paper.title,
+                byline,
+                "Paper ${position + 1} of $count",
+                "Open in Aftergleam"
+            ).filter { it.isNotBlank() }.joinToString(". ") + "."
+            views.setContentDescription(R.id.paper_card, description)
             views.setOnClickFillInIntent(
                 R.id.paper_card,
                 Intent().putExtra(AftergleamContract.EXTRA_PAPER_ID, paper.id)
             )
             return views
+        }
+
+        /** Shows up to [MAX_DOTS] dots; the current paper is the red one, windowed when there are more papers. */
+        private fun bindDots(views: RemoteViews, position: Int, count: Int) {
+            val visible = minOf(count, MAX_DOTS)
+            val start = if (count <= MAX_DOTS) 0 else (position - MAX_DOTS / 2).coerceIn(0, count - MAX_DOTS)
+            DOT_IDS.forEachIndexed { slot, viewId ->
+                if (slot < visible) {
+                    views.setViewVisibility(viewId, View.VISIBLE)
+                    views.setImageViewResource(
+                        viewId,
+                        if (start + slot == position) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
+                    )
+                } else {
+                    views.setViewVisibility(viewId, View.GONE)
+                }
+            }
         }
 
         override fun getLoadingView(): RemoteViews? = null
@@ -114,5 +140,12 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
         override fun onDestroy() {
             papers = emptyList()
         }
+    }
+
+    private companion object {
+        const val MAX_DOTS = 7
+        val DOT_IDS = intArrayOf(
+            R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6
+        )
     }
 }
