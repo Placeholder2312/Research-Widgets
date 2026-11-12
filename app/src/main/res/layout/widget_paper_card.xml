@@ -1,7 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/paper_card" android:layout_width="match_parent" android:layout_height="match_parent" android:clickable="true" android:focusable="true" android:background="@drawable/widget_paper_card_background" android:paddingStart="34dp" android:paddingEnd="34dp" android:paddingTop="3dp" android:paddingBottom="3dp">
- <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center_vertical">
-  <TextView android:id="@+id/paper_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:maxLines="2" android:ellipsize="end" android:textColor="#332B27" android:textSize="16sp" android:textStyle="bold"/>
-  <TextView android:id="@+id/paper_byline" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:maxLines="1" android:ellipsize="end" android:textColor="#76675E" android:textSize="10sp"/>
- </LinearLayout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/paper_card"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/widget_paper_card_background"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="3dp"
+    android:paddingBottom="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/paper_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textColor="#332B27"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/paper_byline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textColor="#76675E"
+            android:textSize="10sp" />
+    </LinearLayout>
 </FrameLayout>
