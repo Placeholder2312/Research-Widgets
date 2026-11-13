@@ -55,7 +55,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    /** Use StackView's own current position so arrows stay in sync with card swipes. */
+    /** Use the flipper's own current position so arrows advance exactly one full-size paper card. */
     private fun move(context: Context, id: Int, delta: Int) {
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
 
@@ -66,7 +66,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         if (count <= 1) return
 
         val navigation = RemoteViews(context.packageName, R.layout.widget_paper_strip)
-        if (delta > 0) navigation.showNext(R.id.paper_stack) else navigation.showPrevious(R.id.paper_stack)
+        if (delta > 0) navigation.showNext(R.id.paper_flipper) else navigation.showPrevious(R.id.paper_flipper)
         AppWidgetManager.getInstance(context).partiallyUpdateAppWidget(id, navigation)
     }
 
@@ -126,8 +126,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }
-            views.setRemoteAdapter(R.id.paper_stack, service)
-            views.setEmptyView(R.id.paper_stack, R.id.empty_state)
+            views.setRemoteAdapter(R.id.paper_flipper, service)
+            views.setEmptyView(R.id.paper_flipper, R.id.empty_state)
 
             val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
                 ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)
@@ -139,13 +139,13 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 openPaper,
                 PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
             )
-            views.setPendingIntentTemplate(R.id.paper_stack, template)
+            views.setPendingIntentTemplate(R.id.paper_flipper, template)
 
             views.setOnClickPendingIntent(R.id.previous_button, movePending(context, id, ACTION_PREVIOUS))
             views.setOnClickPendingIntent(R.id.next_button, movePending(context, id, ACTION_NEXT))
 
             manager.updateAppWidget(id, views)
-            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_stack)
+            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_flipper)
         }
 
         private fun movePending(context: Context, id: Int, action: String): PendingIntent {
