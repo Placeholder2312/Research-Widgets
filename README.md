@@ -37,4 +37,4 @@ GitHub Actions builds are manual-only. The workflow requires the shared keystore
 
 ## Download APK
 
-Signed debug APKs are published by the manual CI workflow to [GitHub Releases](https://github.com/Placeholder2312/Research-Widgets/releases) (`research-widgets-v<version>-build-<n>`). Install the Aftergleam fork first (see below), then install the newest release over any previous one.
+Signed debug APKs are published by the manual CI workflow to [GitHub Releases](https://github.com/Placeholder2312/Research-Widgets/releases) (`research-widgets-v<version>-build-<n>`). Install the Aftergleam fork first (see "Signing is required for IPC" above), then install the newest release over any previous one.
