@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.widget.BaseAdapter
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.StackView
 import org.robolectric.RobolectricTestRunner
@@ -48,13 +49,17 @@ class PaperStripWidgetVisualTest {
 
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
         stack.adapter = PreviewAdapter(activity, titles)
-        activity.setContentView(widget)
-        render(widget, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-current.png")
+        val host = FrameLayout(activity).apply {
+            addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        }
+        activity.setContentView(host)
+        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-current.png")
+        assertNotNull("StackView should contain its current paper card after host layout", stack.currentView)
         assertEquals(0, stack.displayedChild)
 
         stack.showNext()
         shadowOf(android.os.Looper.getMainLooper()).idle()
-        render(widget, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-next.png")
+        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-next.png")
         assertEquals(1, stack.displayedChild)
 
         stack.showPrevious()
@@ -70,12 +75,15 @@ class PaperStripWidgetVisualTest {
         val stack = widget.findViewById<StackView>(R.id.paper_stack)
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
         stack.adapter = PreviewAdapter(activity, titles)
-        activity.setContentView(widget)
+        val host = FrameLayout(activity).apply {
+            addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        }
+        activity.setContentView(host)
 
         assertNotNull(widget.findViewById<ImageView>(R.id.previous_button))
         assertNotNull(widget.findViewById<ImageView>(R.id.next_button))
-        render(widget, 360, 56, "paper-strip-compact.png")
-        render(widget, 420, 96, "paper-strip-tall.png")
+        render(host, 360, 56, "paper-strip-compact.png")
+        render(host, 420, 96, "paper-strip-tall.png")
     }
 
     private fun render(view: View, widthDp: Int, heightDp: Int, name: String) {
@@ -89,6 +97,7 @@ class PaperStripWidgetVisualTest {
         view.layout(0, 0, width, height)
         shadowOf(android.os.Looper.getMainLooper()).idle()
 
+        println("Widget preview view: attached=${view.isAttachedToWindow}, measured=${view.measuredWidth}x${view.measuredHeight}, layout=${view.width}x${view.height}")
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         view.draw(Canvas(bitmap))
         val directory = File("build/widget-previews")
