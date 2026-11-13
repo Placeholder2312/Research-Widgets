@@ -46,33 +46,54 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews? {
             val paper = papers.getOrNull(position) ?: return null
-            val views = RemoteViews(packageName, R.layout.widget_paper_card)
-            views.setTextViewText(R.id.paper_title, paper.title)
+            val options = AppWidgetManager.getInstance(this@PaperStackRemoteViewsService)
+                .getAppWidgetOptions(widgetId)
+            val (width, height) = PaperStripWidgetProvider.sizeDp(this@PaperStackRemoteViewsService, options)
+            val count = papers.size
+            val showDots = count > 1 && height >= 56
 
-            // The byline is no longer shown, but stays in the accessibility description.
+            val horizontalPaddingDp = when {
+                width < 120 -> 8
+                width < 180 -> 12
+                else -> 16
+            }
+            val verticalPaddingDp = when {
+                height < 48 -> 2
+                height < 72 -> 4
+                height < 110 -> 6
+                else -> 10
+            }
+            val baseTitleSize = when {
+                width < 120 -> 11f
+                width < 180 -> 13f
+                width < 270 -> 15f
+                width < 360 -> 17f
+                else -> 19f
+            }
+            // Short strips also hold the dot row; taller widgets get a larger title and more lines.
+            val titleSize = when {
+                height < 72 -> minOf(baseTitleSize, 14f)
+                height >= 150 -> baseTitleSize + 6f
+                height >= 110 -> baseTitleSize + 2f
+                else -> baseTitleSize
+            }
+            val dotsBlockDp = if (showDots) DOT_BLOCK_DP else 0
+            val fittingLines = ((height - 2 * verticalPaddingDp - dotsBlockDp) / (titleSize * LINE_HEIGHT_FACTOR)).toInt()
+            val layoutId = when {
+                fittingLines >= 5 -> R.layout.widget_paper_card_5
+                fittingLines >= 3 -> R.layout.widget_paper_card_3
+                else -> R.layout.widget_paper_card
+            }
+
+            val views = RemoteViews(packageName, layoutId)
+            views.setTextViewText(R.id.paper_title, paper.title)
+            views.setTextViewTextSize(R.id.paper_title, TypedValue.COMPLEX_UNIT_SP, titleSize)
+
+            // The byline is not shown, but stays in the accessibility description.
             val byline = listOf(paper.source, paper.authors, paper.published)
                 .filter { it.isNotBlank() }
                 .joinToString(" · ")
 
-            val options = AppWidgetManager.getInstance(this@PaperStackRemoteViewsService)
-                .getAppWidgetOptions(widgetId)
-            val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 280).coerceAtLeast(1)
-            val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
-            val compact = PaperStripWidgetProvider.isCompact(width, height)
-
-            // With the chevron buttons visible, leave room for them on both sides.
-            val horizontalPaddingDp = if (!compact) {
-                40
-            } else when {
-                width < 120 -> 6
-                width < 180 -> 10
-                else -> 14
-            }
-            val verticalPaddingDp = when {
-                height < 48 -> 2
-                height < 72 -> 3
-                else -> 6
-            }
             val density = resources.displayMetrics.density
             val horizontalPaddingPx = (horizontalPaddingDp * density).toInt()
             val verticalPaddingPx = (verticalPaddingDp * density).toInt()
@@ -84,20 +105,6 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
                 verticalPaddingPx
             )
 
-            val baseTitleSize = when {
-                width < 120 -> 11f
-                width < 180 -> 12f
-                width < 270 -> 14f
-                width >= 360 && height >= 140 -> 22f
-                width >= 360 && height >= 90 -> 18f
-                else -> 16f
-            }
-            // Short strips also hold the dot row, so keep two title lines plus dots inside the height.
-            val titleSize = if (height < 72) minOf(baseTitleSize, 14f) else baseTitleSize
-            views.setTextViewTextSize(R.id.paper_title, TypedValue.COMPLEX_UNIT_SP, titleSize)
-
-            val count = papers.size
-            val showDots = count > 1 && height >= 56
             views.setViewVisibility(R.id.dot_row, if (showDots) View.VISIBLE else View.GONE)
             if (showDots) bindDots(views, position, count)
 
@@ -133,7 +140,7 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
         }
 
         override fun getLoadingView(): RemoteViews? = null
-        override fun getViewTypeCount() = 1
+        override fun getViewTypeCount() = 3
         override fun getItemId(position: Int) = papers.getOrNull(position)?.id?.hashCode()?.toLong() ?: position.toLong()
         override fun hasStableIds() = true
 
@@ -143,6 +150,8 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
     }
 
     private companion object {
+        const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
+        const val LINE_HEIGHT_FACTOR = 1.3f
         const val MAX_DOTS = 7
         val DOT_IDS = intArrayOf(
             R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6

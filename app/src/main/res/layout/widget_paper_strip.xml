@@ -2,12 +2,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/nothing_card_bg">
+    android:background="@drawable/nothing_card_bg"
+    android:clipChildren="true">
 
+    <!--
+      Swipe up/down cycles papers. StackView gives its cards 90% of its own size and parks the
+      back cards in the other 10%; on Android 12+ the provider enlarges the stack so the front card
+      fills the widget and the back cards sit outside it (clipped). Front card sits bottom-start.
+    -->
     <StackView
         android:id="@+id/paper_stack"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="bottom|start"
         android:clipToPadding="false" />
 
     <LinearLayout
@@ -24,77 +31,25 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_marginEnd="5dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/nothing_dot_off" />
-
-            <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_marginEnd="5dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/nothing_dot_off" />
-
-            <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_marginEnd="5dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/nothing_dot_red" />
-
-            <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:layout_marginEnd="5dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/nothing_dot_off" />
-
-            <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/empty_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="monospace"
             android:gravity="center"
             android:letterSpacing="0.1"
             android:maxLines="3"
-            android:ellipsize="end"
             android:padding="10dp"
             android:text="NO PAPERS"
             android:textColor="@color/nothing_muted"
             android:textSize="11sp" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/previous_button"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_gravity="center_vertical|start"
-        android:layout_marginStart="6dp"
-        android:clickable="true"
-        android:contentDescription="Previous paper"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/nothing_chevron_previous" />
-
-    <ImageView
-        android:id="@+id/next_button"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_gravity="center_vertical|end"
-        android:layout_marginEnd="6dp"
-        android:clickable="true"
-        android:contentDescription="Next paper"
-        android:focusable="true"
-        android:scaleType="fitCenter"
-        android:src="@drawable/nothing_chevron_next" />
 </FrameLayout>
