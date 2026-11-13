@@ -4,13 +4,13 @@ Independent Android companion for the customized Aftergleam fork.
 
 - Application ID: `com.placeholder2312.researchwidgets`
 - Minimum SDK: 26; target SDK: 37
-- UI: native Android AppWidget, RemoteViews and StackView
+- UI: native Android AppWidget, RemoteViews and AdapterViewFlipper
 - Network permissions: none
 - Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row. Flick vertically between paper cards using Android's native StackView interaction. Each remote card is explicitly sized to StackView's usable viewport so the active card fills nearly the entire widget; only a narrow edge of the next card peeks out. The outer widget keeps one consistent Nothing rounded shell; transparent paper rows and parent outline clipping prevent moving cards from changing the shell edges. Titles are inset from the dot-matrix chevrons so they remain legible during swipes. Claude's Nothing title typography, red position dots and dark/light colours are retained. Configure each instance for Recommended or Saved.
+1. **Research Paper Strip** — approximately five columns by one row. Shows exactly one full-size paper card at a time using Android's AdapterViewFlipper. The Nothing chevrons move to the previous or next card with a short native view transition. The outer widget keeps one consistent Nothing rounded shell; transparent paper rows and parent outline clipping prevent moving cards from changing the shell edges. Titles are inset from the dot-matrix chevrons so they remain legible. Claude's Nothing title typography, red position dots and dark/light colours are retained. Configure each instance for Recommended or Saved.
 2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
 
 ## Build
