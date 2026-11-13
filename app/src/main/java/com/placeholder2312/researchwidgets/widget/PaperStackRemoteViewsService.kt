@@ -136,16 +136,24 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
             return views
         }
 
-        /** Shows up to [MAX_DOTS] dots; the current paper is the red one, windowed when there are more papers. */
+        /**
+         * Position meter. Up to [MAX_DOTS] papers get one dot each; with more papers the fixed row of dots
+         * is a proportional meter (first dot = first paper, last dot = last paper), so the red dot never
+         * claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
+         */
         private fun bindDots(views: RemoteViews, position: Int, count: Int) {
             val visible = minOf(count, MAX_DOTS)
-            val start = if (count <= MAX_DOTS) 0 else (position - MAX_DOTS / 2).coerceIn(0, count - MAX_DOTS)
+            val active = if (count <= MAX_DOTS) {
+                position
+            } else {
+                Math.round(position * (visible - 1).toFloat() / (count - 1))
+            }
             DOT_IDS.forEachIndexed { slot, viewId ->
                 if (slot < visible) {
                     views.setViewVisibility(viewId, View.VISIBLE)
                     views.setImageViewResource(
                         viewId,
-                        if (start + slot == position) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
+                        if (slot == active) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
                     )
                 } else {
                     views.setViewVisibility(viewId, View.GONE)

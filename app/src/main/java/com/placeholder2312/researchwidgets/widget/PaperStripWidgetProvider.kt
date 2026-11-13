@@ -14,7 +14,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
-import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
@@ -116,9 +115,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.paper_stack, service)
             views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
-            val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
-                ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)
-            )
+            // Taps go through our own trampoline, which forwards to Aftergleam and reports failures.
+            val openPaper = Intent(context, OpenPaperActivity::class.java)
             val mutableFlag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
             val template = PendingIntent.getActivity(
                 context,
