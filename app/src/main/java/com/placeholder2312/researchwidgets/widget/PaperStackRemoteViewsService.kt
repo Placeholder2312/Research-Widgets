@@ -2,6 +2,7 @@ package com.placeholder2312.researchwidgets.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
@@ -10,6 +11,8 @@ import com.placeholder2312.researchwidgets.R
 import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 class PaperStackRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -95,6 +98,17 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
                 .joinToString(" · ")
 
             val density = resources.displayMetrics.density
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // StackView measures each card with AT_MOST, so without an explicit size the card
+                // collapses to its text width (the "squished to the side" bug). The provider sizes the
+                // stack to widget/0.9, so StackView's 90% child frame equals the widget; the card fills
+                // that frame minus StackView's built-in 4dp frame padding on each side.
+                val framePaddingPx = ceil(4f * density).toInt()
+                val cardWidthDp = ((width * density).roundToInt() - 2 * framePaddingPx) / density
+                val cardHeightDp = ((height * density).roundToInt() - 2 * framePaddingPx) / density
+                views.setViewLayoutWidth(R.id.paper_card, cardWidthDp.coerceAtLeast(1f), TypedValue.COMPLEX_UNIT_DIP)
+                views.setViewLayoutHeight(R.id.paper_card, cardHeightDp.coerceAtLeast(1f), TypedValue.COMPLEX_UNIT_DIP)
+            }
             val horizontalPaddingPx = (horizontalPaddingDp * density).toInt()
             val verticalPaddingPx = (verticalPaddingDp * density).toInt()
             views.setViewPadding(
