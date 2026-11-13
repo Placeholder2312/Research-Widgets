@@ -7,12 +7,14 @@
     android:clipToPadding="true"
     android:clipToOutline="true">
 
-    <StackView
-        android:id="@+id/paper_stack"
+    <AdapterViewFlipper
+        android:id="@+id/paper_flipper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:animateFirstView="false" />
+        android:animateFirstView="false"
+        android:autoStart="false"
+        android:loopViews="true" />
 
     <LinearLayout
         android:id="@+id/empty_state"

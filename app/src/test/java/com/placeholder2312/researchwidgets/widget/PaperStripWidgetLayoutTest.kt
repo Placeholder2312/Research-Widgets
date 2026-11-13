@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterViewFlipper
 import android.widget.FrameLayout
-import android.widget.StackView
 import androidx.test.core.app.ApplicationProvider
 import com.placeholder2312.researchwidgets.R
 import org.junit.Assert.assertEquals
@@ -22,25 +22,25 @@ class PaperStripWidgetLayoutTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
-    fun paperStripUsesNativeStackViewCardNavigation() {
+    fun paperStripUsesOneFullViewportAdapterViewFlipper() {
         val parent = FrameLayout(context)
         val widget = LayoutInflater.from(context).inflate(R.layout.widget_paper_strip, parent, false)
-        val stack = widget.findViewById<StackView>(R.id.paper_stack)
+        val flipper = widget.findViewById<AdapterViewFlipper>(R.id.paper_flipper)
 
-        assertNotNull(stack)
-        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, stack.layoutParams.width)
-        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, stack.layoutParams.height)
+        assertNotNull(flipper)
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, flipper.layoutParams.width)
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, flipper.layoutParams.height)
     }
 
     @Test
-    fun shellClipsStackCardsToTheNothingRoundedOutline() {
+    fun shellClipsSinglePaperCardToTheNothingRoundedOutline() {
         val parent = FrameLayout(context)
         val widget = LayoutInflater.from(context).inflate(R.layout.widget_paper_strip, parent, false)
         val card = LayoutInflater.from(context).inflate(R.layout.widget_paper_card, parent, false)
 
         val shell = widget as ViewGroup
-        assertTrue(shell.getClipChildren())
-        assertTrue(shell.getClipToPadding())
+        assertTrue(shell.clipChildren)
+        assertTrue(shell.clipToPadding)
         assertTrue(widget.clipToOutline)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.width)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.height)
