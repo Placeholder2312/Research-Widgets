@@ -16,8 +16,8 @@
 
 ### Phase 2 — companion widgets and settings (implemented)
 - Native AppWidget/RemoteViews app with package `com.placeholder2312.researchwidgets`.
-- Paper Strip uses Android AdapterViewFlipper, which renders exactly one full-size paper card at a time.
-- The single rounded Nothing-style shell and transparent rows preserve the existing visual style. Dot-matrix chevrons move to the previous/next full-size card with a native view transition. The public RemoteViews collection APIs do not expose a custom swipe handler for AdapterViewFlipper; StackView provides swipe gestures but intentionally fans multiple cards. This is a deliberate single-card/gesture trade-off.
+- Paper Strip uses Android StackView for up/down swipe paging, enlarged to widget/0.9 on Android 12+ with explicitly sized cards so one full-width title shows at a time (the back cards sit outside the widget and are clipped).
+- One rounded Nothing-style shell; position dots on each card (proportional meter beyond 7 papers); taps go through an in-app trampoline to Aftergleam.
 - Keep per-instance Recommended/Saved preferences, empty/disconnected states, title typography, red position dots, dark/light colours and dot-matrix previous/next controls.
 - Decorative Aftergleam tile uses the supplied brand mark and opens the customized fork.
 - Companion receiver handles protected data-change notifications and refreshes widgets; boot/update lifecycle handling restores widget state.
@@ -28,11 +28,8 @@
 - CI validates the same keystore in both repositories and verifies each APK's signature before upload.
 
 ### Phase 4 — robustness and visual verification (emulated visual pass complete; device check pending)
+- The earlier Robolectric flipper/chevron tests were removed with the flipper; the StackView widget has not yet been verified on a physical Samsung One UI device.
 - Render the real widget layouts with Robolectric at compact (360×56 dp), standard (420×88 dp), and taller (420×96 dp) dimensions using native graphics.
-- Capture the current-card, next-card, compact and tall screenshots; inspect the rounded shell, title/chevron clearance, Nothing dot row, and transition state.
-- Verify AdapterViewFlipper advances exactly one full-width card per chevron tap and that each card fills at least 95% of the widget width.
-- The shared shell clips the single visible card to its rounded outline; transparent card rows avoid nested rounded corners. RemoteViews card padding mirrors the 40 dp chevron-safe inset used by the live widget.
-- Swipe gestures on a single-card RemoteViews widget are not supported by AdapterViewFlipper; StackView is the collection view with built-in swipe handling, but it presents a multi-card rolodex. The chosen compromise prioritizes the requested one-card visual.
 - Physical Samsung One UI verification remains necessary because launcher hosts can differ.
 
 ### Phase 5 — migration and release (user-controlled)

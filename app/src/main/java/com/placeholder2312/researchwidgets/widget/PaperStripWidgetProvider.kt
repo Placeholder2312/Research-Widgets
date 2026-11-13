@@ -6,21 +6,27 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
-import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
+/**
+ * One paper title fills the widget; swiping up or down cycles papers (platform StackView).
+ * Tapping a title opens that paper in Aftergleam.
+ */
 class PaperStripWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         ids.forEach { updateWidget(context, manager, it) }
     }
 
-    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: android.os.Bundle) {
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
         updateWidget(context, manager, id)
     }
 
@@ -32,50 +38,32 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         for (index in 0 until minOf(oldIds.size, newIds.size)) {
             val oldId = oldIds[index]
             val newId = newIds[index]
-            WidgetPreferences.setMode(context, newId, WidgetPreferences.mode(context, oldId))
-            WidgetPreferences.setIndex(context, newId, WidgetPreferences.index(context, oldId))
+            val mode = WidgetPreferences.mode(context, oldId)
+            val paperIndex = WidgetPreferences.index(context, oldId)
+            WidgetPreferences.setMode(context, newId, mode)
+            WidgetPreferences.setIndex(context, newId, paperIndex)
             WidgetPreferences.clear(context, oldId)
         }
         refreshAll(context)
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        when (intent.action) {
-            ACTION_NEXT -> move(
-                context,
-                intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
-                1
-            )
-            ACTION_PREVIOUS -> move(
-                context,
-                intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
-                -1
-            )
-            else -> super.onReceive(context, intent)
-        }
-    }
-
-    /** Use the flipper's own current position so arrows advance exactly one full-size paper card. */
-    private fun move(context: Context, id: Int, delta: Int) {
-        if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
-
-        val count = PaperProviderClient.read(
-            context,
-            WidgetPreferences.mode(context, id)
-        ).papers.size
-        if (count <= 1) return
-
-        val navigation = RemoteViews(context.packageName, R.layout.widget_paper_strip)
-        if (delta > 0) navigation.showNext(R.id.paper_flipper) else navigation.showPrevious(R.id.paper_flipper)
-        AppWidgetManager.getInstance(context).partiallyUpdateAppWidget(id, navigation)
-    }
-
     companion object {
-        private const val ACTION_NEXT = "com.placeholder2312.researchwidgets.action.PAPER_NEXT"
-        private const val ACTION_PREVIOUS = "com.placeholder2312.researchwidgets.action.PAPER_PREVIOUS"
+        /** StackView gives its cards (1 - 0.1) of its own size; see PERSPECTIVE_SHIFT_FACTOR in AOSP StackView. */
+        private const val STACK_CARD_FRACTION = 0.9f
 
-        /** Below this size the chevrons are hidden to preserve a clear title area. */
-        internal fun isCompact(widthDp: Int, heightDp: Int): Boolean = widthDp < 210 || heightDp < 52
+        /** Current widget size in dp: portrait is (min width, max height), landscape is (max width, min height). */
+        internal fun sizeDp(context: Context, options: Bundle): Pair<Int, Int> {
+            val landscape = context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+            val width = options.getInt(
+                if (landscape) AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH else AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,
+                280
+            )
+            val height = options.getInt(
+                if (landscape) AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT else AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT,
+                64
+            )
+            return width.coerceAtLeast(1) to height.coerceAtLeast(1)
+        }
 
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
@@ -92,33 +80,31 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
 
             val mode = WidgetPreferences.mode(context, id)
             val result = PaperProviderClient.read(context, mode)
-            val count = result.papers.size
             val views = RemoteViews(context.packageName, R.layout.widget_paper_strip)
-
             views.setTextViewText(
                 R.id.empty_text,
                 if (!result.connected || result.papers.isEmpty()) result.message.uppercase() else ""
             )
 
-            val options = manager.getAppWidgetOptions(id)
-            val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 280).coerceAtLeast(1)
-            val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
-            val compact = isCompact(width, height)
-            val canNavigate = !compact && count > 1
+            val (width, height) = sizeDp(context, manager.getAppWidgetOptions(id))
 
-            views.setViewVisibility(R.id.previous_button, if (canNavigate) View.VISIBLE else View.GONE)
-            views.setViewVisibility(R.id.next_button, if (canNavigate) View.VISIBLE else View.GONE)
+            // Make the front card exactly widget-sized by enlarging the stack (Android 12+). The extra
+            // space is above/right of the widget (stack is bottom|start anchored) and is clipped.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                views.setViewLayoutWidth(R.id.paper_stack, width / STACK_CARD_FRACTION, TypedValue.COMPLEX_UNIT_DIP)
+                views.setViewLayoutHeight(R.id.paper_stack, height / STACK_CARD_FRACTION, TypedValue.COMPLEX_UNIT_DIP)
+            }
+
             views.setViewVisibility(
                 R.id.empty_dots,
                 if (width >= 120 && height >= 64) View.VISIBLE else View.GONE
             )
-
             val density = context.resources.displayMetrics.density
             val emptyPadding = ((if (width < 140) 4 else 10) * density).toInt()
             views.setViewPadding(R.id.empty_text, emptyPadding, emptyPadding, emptyPadding, emptyPadding)
             views.setTextViewTextSize(
                 R.id.empty_text,
-                android.util.TypedValue.COMPLEX_UNIT_SP,
+                TypedValue.COMPLEX_UNIT_SP,
                 if (width < 140) 9f else if (width < 190) 10f else 12f
             )
 
@@ -126,12 +112,11 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }
-            views.setRemoteAdapter(R.id.paper_flipper, service)
-            views.setEmptyView(R.id.paper_flipper, R.id.empty_state)
+            views.setRemoteAdapter(R.id.paper_stack, service)
+            views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
-            val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
-                ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)
-            )
+            // Taps go through our own trampoline, which forwards to Aftergleam and reports failures.
+            val openPaper = Intent(context, OpenPaperActivity::class.java)
             val mutableFlag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
             val template = PendingIntent.getActivity(
                 context,
@@ -139,26 +124,11 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 openPaper,
                 PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
             )
-            views.setPendingIntentTemplate(R.id.paper_flipper, template)
+            views.setPendingIntentTemplate(R.id.paper_stack, template)
 
-            views.setOnClickPendingIntent(R.id.previous_button, movePending(context, id, ACTION_PREVIOUS))
-            views.setOnClickPendingIntent(R.id.next_button, movePending(context, id, ACTION_NEXT))
-
+            // No setDisplayedChild: the stack keeps whichever paper the user swiped to across refreshes.
             manager.updateAppWidget(id, views)
-            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_flipper)
-        }
-
-        private fun movePending(context: Context, id: Int, action: String): PendingIntent {
-            val intent = Intent(context, PaperStripWidgetProvider::class.java)
-                .setAction(action)
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
-            val requestCode = id * 2 + if (action == ACTION_NEXT) 1 else 0
-            return PendingIntent.getBroadcast(
-                context,
-                requestCode,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_stack)
         }
     }
 }

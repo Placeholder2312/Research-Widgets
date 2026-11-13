@@ -4,14 +4,14 @@ Independent Android companion for the customized Aftergleam fork.
 
 - Application ID: `com.placeholder2312.researchwidgets`
 - Minimum SDK: 26; target SDK: 37
-- UI: native Android AppWidget, RemoteViews and AdapterViewFlipper
+- UI: native Android AppWidget, RemoteViews and StackView
 - Network permissions: none
 - Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row. Shows exactly one full-size paper card at a time using Android's AdapterViewFlipper. The Nothing chevrons move to the previous or next card with a short native view transition. Note: standard Android home-screen widgets cannot attach custom swipe handlers to AdapterViewFlipper, so this single-card mode uses the chevrons rather than touch swipes. The outer widget keeps one consistent Nothing rounded shell; transparent paper rows and parent outline clipping prevent moving cards from changing the shell edges. Titles are inset from the dot-matrix chevrons so they remain legible. Claude's Nothing title typography, red position dots and dark/light colours are retained. Configure each instance for Recommended or Saved.
-2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
+1. **Research Paper Strip** — approximately five columns by one row. Shows one full-width paper title at a time in the Nothing Classic style (light/dark follows the system); swipe up or down to move through papers (Android StackView). A dot meter shows position (one dot per paper up to 7, proportional beyond that) with the current one in red. On Android 12+ the stack is enlarged to widget/0.9 and each card is sized explicitly, because StackView measures cards with `AT_MOST` and would otherwise shrink them to their text. Tapping a title opens that paper in Aftergleam via an in-app trampoline that reports failures. Configure each instance for Recommended or Saved.
+2. **Aftergleam tile** — approximately 2×2, Nothing Classic card with the Aftergleam artwork, opens the customized app.
 
 ## Build
 
