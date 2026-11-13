@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: widget-visual-previews
-          path: app/build/widget-previews/*.png
+          path: '**/widget-previews/*.png'
           if-no-files-found: warn
       - name: Verify APK signature
         run: |
