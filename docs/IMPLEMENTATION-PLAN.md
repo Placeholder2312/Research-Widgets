@@ -27,10 +27,11 @@
 - Configure identical `RESEARCH_WIDGETS_KEYSTORE_BASE64`, `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`, `RESEARCH_WIDGETS_KEY_ALIAS`, and `RESEARCH_WIDGETS_KEY_PASSWORD` Actions secrets in both repositories.
 - CI validates the same keystore in both repositories and verifies each APK's signature before upload.
 
-### Phase 4 — robustness and visual verification (in progress)
-- Render the real widget layouts with Robolectric at compact, standard and resized launcher dimensions.
-- Save screenshots for the initial card and after card navigation; inspect all screenshots for rounded-edge clipping and the Nothing layout.
+### Phase 4 — robustness and visual verification (emulated visual pass complete; device check pending)
+- Render the real widget layouts with Robolectric at compact (360×56 dp), standard (420×88 dp), and taller (420×96 dp) dimensions using native graphics.
+- Capture the current-card, next-card, compact and tall screenshots; inspect the rounded shell, title/chevron clearance, Nothing dot row, and transition state.
 - Verify native StackView next/previous card selection and arrow synchronization.
+- The shared shell clips the animated StackView to its rounded outline; transparent card rows avoid nested rounded corners. RemoteViews card padding mirrors the 40 dp chevron-safe inset used by the live widget.
 - Physical Samsung One UI verification remains necessary because launcher hosts can differ.
 
 ### Phase 5 — migration and release (user-controlled)
