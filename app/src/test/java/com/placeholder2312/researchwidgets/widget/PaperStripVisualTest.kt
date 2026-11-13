@@ -28,6 +28,8 @@ import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
@@ -61,6 +63,7 @@ class PaperStripWidgetVisualTest {
         activity.setContentView(host)
         render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-current.png")
         assertNotNull("StackView should contain its current paper card after host layout", stack.currentView)
+        assertTrue("The active StackView card should fill at least 85% of the widget width", stack.currentView!!.width >= stack.width * 0.85f)
         assertEquals(0, stack.displayedChild)
 
         stack.showNext()
@@ -167,6 +170,13 @@ class PaperStripWidgetVisualTest {
                 else -> 6
             }
             val density = activity.resources.displayMetrics.density
+            val stackFramePaddingPx = ceil(4f * density).toInt()
+            val cardWidthPx = (widthDp * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx
+            val cardHeightPx = (heightDp * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx
+            view.layoutParams = view.layoutParams.apply {
+                width = cardWidthPx.coerceAtLeast(1)
+                height = cardHeightPx.coerceAtLeast(1)
+            }
             view.setPadding(
                 (horizontalPaddingDp * density).toInt(),
                 (verticalPaddingDp * density).toInt(),
