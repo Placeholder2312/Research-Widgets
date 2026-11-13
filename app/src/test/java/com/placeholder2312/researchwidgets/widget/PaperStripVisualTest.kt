@@ -178,8 +178,15 @@ class PaperStripVisualTest {
                 text = items[position]
                 setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, if (heightDp < 72) minOf(baseTitleSize, 14f) else baseTitleSize)
             }
-            view.findViewById<View>(R.id.dot_row).visibility =
-                if (items.size > 1 && heightDp >= 56) View.VISIBLE else View.GONE
+            val showDots = items.size > 1 && heightDp >= 56
+            view.findViewById<View>(R.id.dot_row).visibility = if (showDots) View.VISIBLE else View.GONE
+            val dotIds = intArrayOf(R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6)
+            dotIds.forEachIndexed { slot, id ->
+                view.findViewById<ImageView>(id).apply {
+                    visibility = if (showDots && slot < items.size) View.VISIBLE else View.GONE
+                    if (slot < items.size) setImageResource(if (slot == position) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off)
+                }
+            }
             return view
         }
     }
