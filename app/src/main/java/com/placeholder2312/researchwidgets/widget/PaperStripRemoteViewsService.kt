@@ -11,12 +11,6 @@ import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
-/**
- * Supplies full-viewport paper rows to the strip's ListView.
- *
- * The ListView shows one row at a time and uses its native vertical scrolling,
- * avoiding StackView's multi-card perspective fan-out in launchers such as One UI.
- */
 class PaperStripRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         val widgetId = intent.getIntExtra(
@@ -29,13 +23,9 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
     private inner class PaperFactory(private val widgetId: Int) : RemoteViewsFactory {
         private var papers = emptyList<com.placeholder2312.researchwidgets.data.WidgetPaper>()
 
-        override fun onCreate() {
-            reload()
-        }
+        override fun onCreate() = reload()
 
-        override fun onDataSetChanged() {
-            reload()
-        }
+        override fun onDataSetChanged() = reload()
 
         private fun reload() {
             papers = if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
@@ -55,7 +45,6 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
             val views = RemoteViews(packageName, R.layout.widget_paper_card)
             views.setTextViewText(R.id.paper_title, paper.title)
 
-            // The byline is intentionally hidden, but remains available to accessibility services.
             val byline = listOf(paper.source, paper.authors, paper.published)
                 .filter { it.isNotBlank() }
                 .joinToString(" · ")
@@ -66,10 +55,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
             val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
             val compact = PaperStripWidgetProvider.isCompact(width, height)
 
-            // Keep clear space for the dot-matrix chevrons when the widget is wide enough.
-            val horizontalPaddingDp = if (!compact) {
-                40
-            } else when {
+            val horizontalPaddingDp = if (!compact) 40 else when {
                 width < 120 -> 6
                 width < 180 -> 10
                 else -> 14
@@ -80,14 +66,12 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 else -> 6
             }
             val density = resources.displayMetrics.density
-            val horizontalPaddingPx = (horizontalPaddingDp * density).toInt()
-            val verticalPaddingPx = (verticalPaddingDp * density).toInt()
             views.setViewPadding(
                 R.id.paper_card,
-                horizontalPaddingPx,
-                verticalPaddingPx,
-                horizontalPaddingPx,
-                verticalPaddingPx
+                (horizontalPaddingDp * density).toInt(),
+                (verticalPaddingDp * density).toInt(),
+                (horizontalPaddingDp * density).toInt(),
+                (verticalPaddingDp * density).toInt()
             )
 
             val baseTitleSize = when {
@@ -98,8 +82,11 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 width >= 360 && height >= 90 -> 18f
                 else -> 16f
             }
-            val titleSize = if (height < 72) minOf(baseTitleSize, 14f) else baseTitleSize
-            views.setTextViewTextSize(R.id.paper_title, TypedValue.COMPLEX_UNIT_SP, titleSize)
+            views.setTextViewTextSize(
+                R.id.paper_title,
+                TypedValue.COMPLEX_UNIT_SP,
+                if (height < 72) minOf(baseTitleSize, 14f) else baseTitleSize
+            )
 
             val count = papers.size
             val showDots = count > 1 && height >= 56
@@ -110,7 +97,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 paper.title,
                 byline,
                 "Paper ${position + 1} of $count",
-                "Swipe vertically to browse papers. Open in Aftergleam."
+                "Swipe up or down to browse papers. Open in Aftergleam."
             ).filter { it.isNotBlank() }.joinToString(". ") + "."
             views.setContentDescription(R.id.paper_card, description)
             views.setOnClickFillInIntent(
