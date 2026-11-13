@@ -1,7 +1,5 @@
 name: Android build and tests
 on:
-  push:
-    branches: [fix/card-swipe-edge-clipping]
   workflow_dispatch:
 permissions:
   contents: read
