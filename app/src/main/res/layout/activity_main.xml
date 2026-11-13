@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/nothing_page"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            <ImageView android:layout_width="6dp" android:layout_height="6dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Research Widgets"
+            android:textColor="@color/nothing_ink"
+            android:textSize="34sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-light"
+            android:text="A local companion for your customized Aftergleam installation. Add both widgets from your launcher’s widget picker."
+            android:textColor="@color/nothing_muted"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/nothing_card_bg"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:importantForAccessibility="no"
+                android:letterSpacing="0.12"
+                android:text="CONNECTION"
+                android:textColor="@color/nothing_muted"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/connection_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="monospace"
+                android:text="Checking Aftergleam…"
+                android:textColor="@color/nothing_ink"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/check_connection"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/nothing_button_filled"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.1"
+            android:stateListAnimator="@null"
+            android:text="Check connection"
+            android:textColor="@color/nothing_page"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/refresh_widgets"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/nothing_button_outline"
+            android:fontFamily="monospace"
+            android:letterSpacing="0.1"
+            android:stateListAnimator="@null"
+            android:text="Refresh widgets"
+            android:textColor="@color/nothing_ink"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:fontFamily="sans-serif-light"
+            android:text="No account, server, analytics or network access. Paper metadata stays on this device."
+            android:textColor="@color/nothing_muted"
+            android:textSize="13sp" />
+    </LinearLayout>
+</ScrollView>

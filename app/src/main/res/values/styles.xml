@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ResearchWidgets" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:colorAccent">@color/nothing_red</item>
+        <item name="android:windowBackground">@color/nothing_page</item>
+        <item name="android:textColorPrimary">@color/nothing_ink</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">@color/nothing_page</item>
+        <item name="android:statusBarColor">@color/nothing_page</item>
+    </style>
+</resources>

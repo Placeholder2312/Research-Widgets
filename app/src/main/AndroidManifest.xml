@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="si.jakobkreft.aftergleam.permission.READ_RESEARCH_WIDGETS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <queries><provider android:authorities="si.jakobkreft.aftergleam.researchwidgets" /></queries>
+    <application android:allowBackup="false" android:icon="@mipmap/ic_launcher" android:roundIcon="@mipmap/ic_launcher" android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/Theme.ResearchWidgets" android:usesCleartextTraffic="false">
+        <activity android:name=".ui.WidgetConfigActivity" android:exported="true" android:excludeFromRecents="true" android:label="@string/widget_config_title" />
+        <activity android:name=".ui.MainActivity" android:exported="true" android:label="@string/app_name"><intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter></activity>
+        <receiver android:name=".widget.PaperStripWidgetProvider" android:exported="true"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/paper_strip_info" /></receiver>
+        <receiver android:name=".widget.AftergleamTileWidgetProvider" android:exported="true"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/aftergleam_tile_info" /></receiver>
+        <receiver android:name=".widget.ResearchWidgetsChangeReceiver" android:exported="true" android:permission="si.jakobkreft.aftergleam.permission.READ_RESEARCH_WIDGETS"><intent-filter><action android:name="si.jakobkreft.aftergleam.action.RESEARCH_WIDGETS_DATA_CHANGED" /></intent-filter></receiver>
+        <receiver android:name=".widget.WidgetLifecycleReceiver" android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".widget.PaperStackRemoteViewsService" android:exported="true" android:permission="android.permission.BIND_REMOTEVIEWS" />
+    </application>
+</manifest>

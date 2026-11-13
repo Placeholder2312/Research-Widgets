@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nothing Classic tokens, light. Card/text/muted are [I] values from the nothing-widgets skill; red is [C]. -->
+    <color name="nothing_card">#EDEDED</color>
+    <color name="nothing_ink">#000000</color>
+    <color name="nothing_muted">#6B6B6B</color>
+    <color name="nothing_red">#D71921</color>
+    <color name="nothing_dot_idle">#596B6B6B</color>
+    <color name="nothing_page">#FFFFFF</color>
+    <color name="nothing_outline">#1F000000</color>
+</resources>
