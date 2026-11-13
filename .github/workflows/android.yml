@@ -1,7 +1,5 @@
 name: Android build and tests
 on:
-  push:
-    branches: [fix/stackview-full-width-cards]
   workflow_dispatch:
 permissions:
   contents: read
