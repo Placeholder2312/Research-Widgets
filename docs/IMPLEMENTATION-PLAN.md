@@ -16,8 +16,8 @@
 
 ### Phase 2 — companion widgets and settings (implemented)
 - Native AppWidget/RemoteViews app with package `com.placeholder2312.researchwidgets`.
-- Paper Strip uses Android StackView's discrete up/down card-swipe navigation.
-- A single rounded Nothing-style shell clips the StackView and chevrons at the widget bounds. Paper rows are transparent so card transitions do not create nested rounded corners or distorted edge cutouts. On Android 12+, the RemoteViews card is explicitly sized to StackView's 90% child viewport (minus its built-in frame padding); this prevents text-intrinsic sizing from making the stack fan across the strip and lets the active card fill nearly the whole widget.
+- Paper Strip uses Android AdapterViewFlipper, which renders exactly one full-size paper card at a time.
+- The single rounded Nothing-style shell and transparent rows preserve the existing visual style. Dot-matrix chevrons move to the previous/next full-size card with a native view transition. The public RemoteViews collection APIs do not expose a custom swipe handler for AdapterViewFlipper; StackView provides swipe gestures but intentionally fans multiple cards. This is a deliberate single-card/gesture trade-off.
 - Keep per-instance Recommended/Saved preferences, empty/disconnected states, title typography, red position dots, dark/light colours and dot-matrix previous/next controls.
 - Decorative Aftergleam tile uses the supplied brand mark and opens the customized fork.
 - Companion receiver handles protected data-change notifications and refreshes widgets; boot/update lifecycle handling restores widget state.
