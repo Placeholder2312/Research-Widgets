@@ -3,7 +3,7 @@
     android:id="@+id/paper_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/nothing_card_bg"
+    android:background="@android:color/transparent"
     android:clickable="true"
     android:focusable="true"
     android:paddingStart="14dp"
@@ -86,6 +86,7 @@
                 android:id="@+id/dot_6"
                 android:layout_width="6dp"
                 android:layout_height="6dp"
+                android:layout_marginEnd="5dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/nothing_dot_off" />
         </LinearLayout>
