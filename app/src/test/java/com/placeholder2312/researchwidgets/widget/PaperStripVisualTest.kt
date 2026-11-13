@@ -7,11 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.widget.BaseAdapter
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.StackView
+import org.robolectric.RobolectricTestRunner
 import android.widget.TextView
-import androidx.test.core.app.ApplicationProvider
 import com.placeholder2312.researchwidgets.R
 import java.io.File
 import java.io.FileOutputStream
