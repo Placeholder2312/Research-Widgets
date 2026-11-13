@@ -30,8 +30,9 @@
 ### Phase 4 — robustness and visual verification (emulated visual pass complete; device check pending)
 - Render the real widget layouts with Robolectric at compact (360×56 dp), standard (420×88 dp), and taller (420×96 dp) dimensions using native graphics.
 - Capture the current-card, next-card, compact and tall screenshots; inspect the rounded shell, title/chevron clearance, Nothing dot row, and transition state.
-- Verify native StackView next/previous card selection and arrow synchronization.
-- The shared shell clips the animated StackView to its rounded outline; transparent card rows avoid nested rounded corners. RemoteViews card padding mirrors the 40 dp chevron-safe inset used by the live widget.
+- Verify AdapterViewFlipper advances exactly one full-width card per chevron tap and that each card fills at least 95% of the widget width.
+- The shared shell clips the single visible card to its rounded outline; transparent card rows avoid nested rounded corners. RemoteViews card padding mirrors the 40 dp chevron-safe inset used by the live widget.
+- Swipe gestures on a single-card RemoteViews widget are not supported by AdapterViewFlipper; StackView is the collection view with built-in swipe handling, but it presents a multi-card rolodex. The chosen compromise prioritizes the requested one-card visual.
 - Physical Samsung One UI verification remains necessary because launcher hosts can differ.
 
 ### Phase 5 — migration and release (user-controlled)
