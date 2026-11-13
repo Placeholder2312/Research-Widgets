@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
+import android.util.TypedValue
 import android.widget.BaseAdapter
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -53,7 +54,7 @@ class PaperStripWidgetVisualTest {
         assertTrue(widget.clipToOutline)
 
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
-        stack.adapter = PreviewAdapter(activity, titles)
+        stack.adapter = PreviewAdapter(activity, titles, WIDTH_DP, HEIGHT_DP)
         val host = FrameLayout(activity).apply {
             addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
@@ -79,7 +80,8 @@ class PaperStripWidgetVisualTest {
         val widget = LayoutInflater.from(activity).inflate(R.layout.widget_paper_strip, null, false)
         val stack = widget.findViewById<StackView>(R.id.paper_stack)
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
-        stack.adapter = PreviewAdapter(activity, titles)
+        val previewAdapter = PreviewAdapter(activity, titles, 360, 56)
+        stack.adapter = previewAdapter
         val host = FrameLayout(activity).apply {
             addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
@@ -88,6 +90,8 @@ class PaperStripWidgetVisualTest {
         assertNotNull(widget.findViewById<ImageView>(R.id.previous_button))
         assertNotNull(widget.findViewById<ImageView>(R.id.next_button))
         render(host, 360, 56, "paper-strip-compact.png")
+        previewAdapter.setWidgetSize(420, 96)
+        shadowOf(android.os.Looper.getMainLooper()).idle()
         render(host, 420, 96, "paper-strip-tall.png")
     }
 
@@ -132,8 +136,16 @@ class PaperStripWidgetVisualTest {
 
     private class PreviewAdapter(
         private val activity: Activity,
-        private val items: List<String>
+        private val items: List<String>,
+        private var widthDp: Int,
+        private var heightDp: Int
     ) : BaseAdapter() {
+        fun setWidgetSize(width: Int, height: Int) {
+            widthDp = width
+            heightDp = height
+            notifyDataSetChanged()
+        }
+
         override fun getCount() = items.size
         override fun getItem(position: Int) = items[position]
         override fun getItemId(position: Int) = position.toLong()
@@ -141,9 +153,41 @@ class PaperStripWidgetVisualTest {
         override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(activity)
                 .inflate(R.layout.widget_paper_card, parent, false)
-            view.findViewById<TextView>(R.id.paper_title).text = items[position]
-            val dots = view.findViewById<View>(R.id.dot_row)
-            dots.visibility = if (items.size > 1) View.VISIBLE else View.GONE
+
+            // Mirror PaperStripRemoteViewsService exactly so arrow/title clearance is represented in PNGs.
+            val compact = widthDp < 210 || heightDp < 52
+            val horizontalPaddingDp = if (!compact) 40 else when {
+                widthDp < 120 -> 6
+                widthDp < 180 -> 10
+                else -> 14
+            }
+            val verticalPaddingDp = when {
+                heightDp < 48 -> 2
+                heightDp < 72 -> 3
+                else -> 6
+            }
+            val density = activity.resources.displayMetrics.density
+            view.setPadding(
+                (horizontalPaddingDp * density).toInt(),
+                (verticalPaddingDp * density).toInt(),
+                (horizontalPaddingDp * density).toInt(),
+                (verticalPaddingDp * density).toInt()
+            )
+
+            val baseTitleSize = when {
+                widthDp < 120 -> 11f
+                widthDp < 180 -> 12f
+                widthDp < 270 -> 14f
+                widthDp >= 360 && heightDp >= 140 -> 22f
+                widthDp >= 360 && heightDp >= 90 -> 18f
+                else -> 16f
+            }
+            view.findViewById<TextView>(R.id.paper_title).apply {
+                text = items[position]
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (heightDp < 72) minOf(baseTitleSize, 14f) else baseTitleSize)
+            }
+            view.findViewById<View>(R.id.dot_row).visibility =
+                if (items.size > 1 && heightDp >= 56) View.VISIBLE else View.GONE
             return view
         }
     }
