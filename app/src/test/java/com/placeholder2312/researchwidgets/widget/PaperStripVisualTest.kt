@@ -9,12 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
-import android.util.TypedValue
+import android.widget.AdapterViewFlipper
 import android.widget.BaseAdapter
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.StackView
-import org.robolectric.RobolectricTestRunner
 import android.widget.TextView
 import com.placeholder2312.researchwidgets.R
 import java.io.File
@@ -28,13 +26,11 @@ import org.robolectric.Robolectric
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-class PaperStripWidgetVisualTest {
+class PaperStripVisualTest {
     private val titles = listOf(
         "Beyond the Limits of Human Reasoning",
         "When and how can AI improve scientific discovery?",
@@ -43,48 +39,52 @@ class PaperStripWidgetVisualTest {
     )
 
     @Test
-    fun restoresNativeCardSwipeAndKeepsTheWidgetClippedToItsRoundedShell() {
+    fun flipperShowsOneFullSizeCardAndAdvancesBetweenPages() {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         activity.setTheme(R.style.Theme_ResearchWidgets)
         val widget = LayoutInflater.from(activity).inflate(R.layout.widget_paper_strip, null, false)
-        val stack = widget.findViewById<StackView>(R.id.paper_stack)
+        val flipper = widget.findViewById<AdapterViewFlipper>(R.id.paper_flipper)
 
-        assertNotNull(stack)
-        val shell = widget as android.view.ViewGroup
-        assertTrue(shell.getClipChildren())
-        assertTrue(shell.getClipToPadding())
+        assertNotNull(flipper)
+        val shell = widget as ViewGroup
+        assertTrue(shell.clipChildren)
+        assertTrue(shell.clipToPadding)
         assertTrue(widget.clipToOutline)
 
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
-        stack.adapter = PreviewAdapter(activity, titles, WIDTH_DP, HEIGHT_DP)
+        flipper.adapter = PreviewAdapter(activity, titles, WIDTH_DP, HEIGHT_DP)
         val host = FrameLayout(activity).apply {
             addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
         activity.setContentView(host)
-        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-current.png")
-        assertNotNull("StackView should contain its current paper card after host layout", stack.currentView)
-        assertTrue("The active StackView card should fill at least 85% of the widget width", stack.currentView!!.width >= stack.width * 0.85f)
-        assertEquals(0, stack.displayedChild)
-
-        stack.showNext()
+        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-card-current.png")
         shadowOf(android.os.Looper.getMainLooper()).idle()
-        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-next.png")
-        assertEquals(1, stack.displayedChild)
+        assertEquals(0, flipper.displayedChild)
+        assertNotNull(flipper.currentView)
+        assertTrue(
+            "The visible card must fill at least 95% of the flipper width",
+            flipper.currentView!!.width >= flipper.width * 0.95f
+        )
 
-        stack.showPrevious()
+        flipper.showNext()
         shadowOf(android.os.Looper.getMainLooper()).idle()
-        assertEquals(0, stack.displayedChild)
+        render(host, WIDTH_DP, HEIGHT_DP, "paper-strip-card-next.png")
+        assertEquals(1, flipper.displayedChild)
+
+        flipper.showPrevious()
+        shadowOf(android.os.Looper.getMainLooper()).idle()
+        assertEquals(0, flipper.displayedChild)
     }
 
     @Test
-    fun compactAndTallWidgetLayoutsRenderWithoutLosingTheNothingArrowsOrDots() {
+    fun compactAndTallCardsKeepNothingArrowsAndPositionDots() {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
         activity.setTheme(R.style.Theme_ResearchWidgets)
         val widget = LayoutInflater.from(activity).inflate(R.layout.widget_paper_strip, null, false)
-        val stack = widget.findViewById<StackView>(R.id.paper_stack)
+        val flipper = widget.findViewById<AdapterViewFlipper>(R.id.paper_flipper)
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
-        val previewAdapter = PreviewAdapter(activity, titles, 360, 56)
-        stack.adapter = previewAdapter
+        val adapter = PreviewAdapter(activity, titles, 360, 56)
+        flipper.adapter = adapter
         val host = FrameLayout(activity).apply {
             addView(widget, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         }
@@ -92,18 +92,16 @@ class PaperStripWidgetVisualTest {
 
         assertNotNull(widget.findViewById<ImageView>(R.id.previous_button))
         assertNotNull(widget.findViewById<ImageView>(R.id.next_button))
-        render(host, 360, 56, "paper-strip-compact.png")
-        previewAdapter.setWidgetSize(420, 96)
+        render(host, 360, 56, "paper-strip-card-compact.png")
+        adapter.setWidgetSize(420, 96)
         shadowOf(android.os.Looper.getMainLooper()).idle()
-        render(host, 420, 96, "paper-strip-tall.png")
+        render(host, 420, 96, "paper-strip-card-tall.png")
     }
 
     private fun render(view: View, widthDp: Int, heightDp: Int, name: String) {
         val density = view.resources.displayMetrics.density
         val width = (widthDp * density).toInt()
         val height = (heightDp * density).toInt()
-
-        // Drain the Activity's first layout, then size the host to the widget's requested launcher cell.
         shadowOf(android.os.Looper.getMainLooper()).idle()
         view.measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
@@ -111,25 +109,18 @@ class PaperStripWidgetVisualTest {
         )
         view.layout(0, 0, width, height)
 
-        // Robolectric does not apply a View background outline when drawing an attached RemoteViews host.
-        // The production widget keeps clipToOutline=true; emulate that same rounded host clip in this bitmap.
-        val widgetRoot = (view as ViewGroup).getChildAt(0)
-        widgetRoot.clipToOutline = false
+        // Emulate the launcher clipping the widget root to its Nothing rounded background.
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         val radius = 28f * density
         val outline = Path().apply {
-            addRoundRect(
-                RectF(0f, 0f, width.toFloat(), height.toFloat()),
-                radius,
-                radius,
-                Path.Direction.CW
-            )
+            addRoundRect(RectF(0f, 0f, width.toFloat(), height.toFloat()), radius, radius, Path.Direction.CW)
         }
         canvas.save()
         canvas.clipPath(outline)
         view.draw(canvas)
         canvas.restore()
+
         val directory = File("build/widget-previews")
         directory.mkdirs()
         println("Widget preview screenshot: ${File(directory, name).absolutePath} (${width}x${height})")
@@ -153,11 +144,9 @@ class PaperStripWidgetVisualTest {
         override fun getItem(position: Int) = items[position]
         override fun getItemId(position: Int) = position.toLong()
 
-        override fun getView(position: Int, convertView: View?, parent: android.view.ViewGroup): View {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(activity)
                 .inflate(R.layout.widget_paper_card, parent, false)
-
-            // Mirror PaperStripRemoteViewsService exactly so arrow/title clearance is represented in PNGs.
             val compact = widthDp < 210 || heightDp < 52
             val horizontalPaddingDp = if (!compact) 40 else when {
                 widthDp < 120 -> 6
@@ -170,20 +159,12 @@ class PaperStripWidgetVisualTest {
                 else -> 6
             }
             val density = activity.resources.displayMetrics.density
-            val stackFramePaddingPx = ceil(4f * density).toInt()
-            val cardWidthPx = (widthDp * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx
-            val cardHeightPx = (heightDp * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx
-            view.layoutParams = view.layoutParams.apply {
-                width = cardWidthPx.coerceAtLeast(1)
-                height = cardHeightPx.coerceAtLeast(1)
-            }
             view.setPadding(
                 (horizontalPaddingDp * density).toInt(),
                 (verticalPaddingDp * density).toInt(),
                 (horizontalPaddingDp * density).toInt(),
                 (verticalPaddingDp * density).toInt()
             )
-
             val baseTitleSize = when {
                 widthDp < 120 -> 11f
                 widthDp < 180 -> 12f
@@ -194,7 +175,7 @@ class PaperStripWidgetVisualTest {
             }
             view.findViewById<TextView>(R.id.paper_title).apply {
                 text = items[position]
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, if (heightDp < 72) minOf(baseTitleSize, 14f) else baseTitleSize)
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, if (heightDp < 72) minOf(baseTitleSize, 14f) else baseTitleSize)
             }
             view.findViewById<View>(R.id.dot_row).visibility =
                 if (items.size > 1 && heightDp >= 56) View.VISIBLE else View.GONE
