@@ -38,6 +38,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             val oldId = oldIds[index]
             val newId = newIds[index]
             WidgetPreferences.setMode(context, newId, WidgetPreferences.mode(context, oldId))
+            WidgetPreferences.setIndex(context, newId, WidgetPreferences.index(context, oldId))
             WidgetPreferences.clear(context, oldId)
         }
         refreshAll(context)
