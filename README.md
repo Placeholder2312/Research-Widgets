@@ -4,15 +4,16 @@ Independent Android companion for the customized Aftergleam fork.
 
 - Application ID: `com.placeholder2312.researchwidgets`
 - Minimum SDK: 26; target SDK: 37
-- UI: native Android AppWidget, RemoteViews and StackView
+- UI: native Android AppWidget, RemoteViews and a full-viewport ListView
 - Network permissions: none
 - Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
-- Development branch: `feature/aftergleam-integration`
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row, one paper per card, vertical StackView navigation plus accessible previous/next controls. Configure each instance for Recommended or Saved.
+1. **Research Paper Strip** — approximately five columns by one row. It shows one full-viewport paper title at a time; swipe vertically to move to the next or previous title. Nothing Classic styling, position dots and dot-matrix previous/next controls are retained. Configure each instance for Recommended or Saved.
 2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
+
+The paper rows fill the widget's available height so the launcher does not fan several titles across the strip. The ListView scrolls vertically; the side chevrons provide an additional one-paper navigation control.
 
 ## Build
 
@@ -31,17 +32,6 @@ The companion build uses this key for debug and release when configured. The Aft
 
 Install the customized Aftergleam fork before Research Widgets so Android knows the custom permission owner. The official Aftergleam application does not expose this API.
 
-## Current status
+## CI
 
-The native app, provider client, both widgets, per-instance configuration, protected refresh receiver, boot/app-replacement refresh, and widget-ID restore handling are on the feature branch. CI has successfully run `testDebugUnitTest` and `assembleDebug`; the latest CI APK uses the runner's default debug key unless the shared-keystore secrets above are configured. Real two-app signature-permission testing, emulator interaction tests and Samsung One UI gesture testing remain pending.
-
-## Optional CI signing for cross-app IPC
-
-To make the GitHub Actions debug APK use the same certificate as Aftergleam, add these four Actions secrets to **both repositories** with identical values:
-
-- `RESEARCH_WIDGETS_KEYSTORE_BASE64`: base64 encoding of the private `.jks` keystore file (the key itself is never committed)
-- `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`
-- `RESEARCH_WIDGETS_KEY_ALIAS`
-- `RESEARCH_WIDGETS_KEY_PASSWORD`
-
-When the base64 secret is present, CI decodes the keystore into the temporary runner directory and signs the debug APK with it. Without these secrets, CI still builds a debug APK using that repository's generated debug key, which is suitable for build validation but **cannot pass signature-level IPC** with the other app.
+GitHub Actions builds are manual-only. The workflow requires the shared keystore secrets, validates the keystore before compilation and prints the certificate fingerprint used by the APK signing step. The APK signature is verified before the artifact is uploaded.

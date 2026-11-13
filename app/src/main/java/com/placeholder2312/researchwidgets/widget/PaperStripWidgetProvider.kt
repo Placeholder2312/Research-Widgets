@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
@@ -21,7 +20,12 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         ids.forEach { updateWidget(context, manager, it) }
     }
 
-    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        manager: AppWidgetManager,
+        id: Int,
+        options: android.os.Bundle
+    ) {
         updateWidget(context, manager, id)
     }
 
@@ -33,10 +37,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         for (index in 0 until minOf(oldIds.size, newIds.size)) {
             val oldId = oldIds[index]
             val newId = newIds[index]
-            val mode = WidgetPreferences.mode(context, oldId)
-            val paperIndex = WidgetPreferences.index(context, oldId)
-            WidgetPreferences.setMode(context, newId, mode)
-            WidgetPreferences.setIndex(context, newId, paperIndex)
+            WidgetPreferences.setMode(context, newId, WidgetPreferences.mode(context, oldId))
+            WidgetPreferences.setIndex(context, newId, WidgetPreferences.index(context, oldId))
             WidgetPreferences.clear(context, oldId)
         }
         refreshAll(context)
@@ -44,25 +46,44 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            ACTION_NEXT -> move(context, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID), 1)
-            ACTION_PREVIOUS -> move(context, intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID), -1)
+            ACTION_NEXT -> move(
+                context,
+                intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
+                1
+            )
+            ACTION_PREVIOUS -> move(
+                context,
+                intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID),
+                -1
+            )
             else -> super.onReceive(context, intent)
         }
     }
 
+    /**
+     * ListView owns the current scroll position, including changes made by a swipe.
+     * Move relative to that live position instead of keeping a second, stale index in preferences.
+     */
     private fun move(context: Context, id: Int, delta: Int) {
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
-        val count = PaperProviderClient.read(context, WidgetPreferences.mode(context, id)).papers.size
-        if (count == 0) return
-        WidgetPreferences.setIndex(context, id, (WidgetPreferences.index(context, id) + delta + count) % count)
-        updateWidget(context, AppWidgetManager.getInstance(context), id)
+
+        val count = PaperProviderClient.read(
+            context,
+            WidgetPreferences.mode(context, id)
+        ).papers.size
+        if (count <= 1) return
+
+        val scroll = RemoteViews(context.packageName, R.layout.widget_paper_strip).apply {
+            setRelativeScrollPosition(R.id.paper_list, delta)
+        }
+        AppWidgetManager.getInstance(context).partiallyUpdateAppWidget(id, scroll)
     }
 
     companion object {
         private const val ACTION_NEXT = "com.placeholder2312.researchwidgets.action.PAPER_NEXT"
         private const val ACTION_PREVIOUS = "com.placeholder2312.researchwidgets.action.PAPER_PREVIOUS"
 
-        /** Below this size the previous/next buttons are hidden and the card uses tighter padding. */
+        /** Below this size the chevrons are hidden so the title keeps usable width. */
         internal fun isCompact(widthDp: Int, heightDp: Int): Boolean = widthDp < 210 || heightDp < 52
 
         fun refreshAll(context: Context) {
@@ -80,7 +101,9 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
 
             val mode = WidgetPreferences.mode(context, id)
             val result = PaperProviderClient.read(context, mode)
+            val count = result.papers.size
             val views = RemoteViews(context.packageName, R.layout.widget_paper_strip)
+
             views.setTextViewText(
                 R.id.empty_text,
                 if (!result.connected || result.papers.isEmpty()) result.message.uppercase() else ""
@@ -90,9 +113,16 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             val width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 280).coerceAtLeast(1)
             val height = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 64).coerceAtLeast(1)
             val compact = isCompact(width, height)
+            val canNavigate = !compact && count > 1
 
-            views.setViewVisibility(R.id.previous_button, if (compact) View.GONE else View.VISIBLE)
-            views.setViewVisibility(R.id.next_button, if (compact) View.GONE else View.VISIBLE)
+            views.setViewVisibility(
+                R.id.previous_button,
+                if (canNavigate) View.VISIBLE else View.GONE
+            )
+            views.setViewVisibility(
+                R.id.next_button,
+                if (canNavigate) View.VISIBLE else View.GONE
+            )
             views.setViewVisibility(
                 R.id.empty_dots,
                 if (width >= 120 && height >= 64) View.VISIBLE else View.GONE
@@ -107,12 +137,12 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 if (width < 140) 9f else if (width < 190) 10f else 12f
             )
 
-            val service = Intent(context, PaperStackRemoteViewsService::class.java).apply {
+            val service = Intent(context, PaperStripRemoteViewsService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }
-            views.setRemoteAdapter(R.id.paper_stack, service)
-            views.setEmptyView(R.id.paper_stack, R.id.empty_state)
+            views.setRemoteAdapter(R.id.paper_list, service)
+            views.setEmptyView(R.id.paper_list, R.id.empty_state)
 
             val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
                 ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)
@@ -124,19 +154,13 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 openPaper,
                 PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
             )
-            views.setPendingIntentTemplate(R.id.paper_stack, template)
+            views.setPendingIntentTemplate(R.id.paper_list, template)
 
             views.setOnClickPendingIntent(R.id.previous_button, movePending(context, id, ACTION_PREVIOUS))
             views.setOnClickPendingIntent(R.id.next_button, movePending(context, id, ACTION_NEXT))
 
-            val count = result.papers.size
-            val storedIndex = WidgetPreferences.index(context, id)
-            val selectedIndex = if (count == 0) 0 else storedIndex % count
-            if (selectedIndex != storedIndex) WidgetPreferences.setIndex(context, id, selectedIndex)
-            views.setDisplayedChild(R.id.paper_stack, selectedIndex)
-
             manager.updateAppWidget(id, views)
-            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_stack)
+            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_list)
         }
 
         private fun movePending(context: Context, id: Int, action: String): PendingIntent {
