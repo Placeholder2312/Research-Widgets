@@ -33,3 +33,13 @@ Install the customized Aftergleam fork before Research Widgets so Android knows 
 ## CI
 
 GitHub Actions builds are manual-only. The workflow requires the shared keystore secrets, validates the keystore before compilation and prints the certificate fingerprint used by the APK signing step. The APK signature is verified before the artifact is uploaded. The test job also renders widget screenshots at compact, standard and resized dimensions for visual inspection.
+
+
+## Download APK
+
+- **[Download Research Widgets v1.3.3 APK](https://github.com/Placeholder2312/Research-Widgets/blob/apk-downloads/downloads/Research-Widgets-v1.3.3-debug.apk?raw=true)**
+- Version code: 7
+- APK size: 935,148 bytes
+- SHA-256: `61dc31bc314c6a6ac57b3aeaf94aae83aff7271393ef559f4fcbec92a794ad27`
+
+Build provenance: this APK was built successfully and signed from branch `fix/stackview-full-width-cards` at commit `00ad2644dc107a92fcb257e5bfd25ce6e4dfc13d`. It is not a build of `feature/aftergleam-integration`; that branch was at v1.3.0 when checked.
