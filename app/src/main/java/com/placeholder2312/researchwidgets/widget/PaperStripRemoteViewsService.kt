@@ -2,7 +2,6 @@ package com.placeholder2312.researchwidgets.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.Intent
-import android.os.Build
 import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
@@ -11,8 +10,6 @@ import com.placeholder2312.researchwidgets.R
 import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 class PaperStripRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
@@ -69,17 +66,6 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 else -> 6
             }
             val density = resources.displayMetrics.density
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                // StackView measures each item with AT_MOST. Without an explicit size, the
-                // transparent FrameLayout collapses to its text width and StackView fans
-                // the papers across the strip. Match StackView's 90% child viewport so the
-                // active card occupies the full usable widget area and only a small peek remains.
-                val stackFramePaddingPx = ceil(4f * density).toInt()
-                val cardWidthDp = ((width * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx) / density
-                val cardHeightDp = ((height * density * 0.9f).roundToInt() - 2 * stackFramePaddingPx) / density
-                views.setViewLayoutWidth(R.id.paper_card, cardWidthDp.coerceAtLeast(1f), TypedValue.COMPLEX_UNIT_DIP)
-                views.setViewLayoutHeight(R.id.paper_card, cardHeightDp.coerceAtLeast(1f), TypedValue.COMPLEX_UNIT_DIP)
-            }
             views.setViewPadding(
                 R.id.paper_card,
                 (horizontalPaddingDp * density).toInt(),
