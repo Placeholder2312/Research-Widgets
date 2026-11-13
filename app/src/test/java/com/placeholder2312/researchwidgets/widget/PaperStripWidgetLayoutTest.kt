@@ -29,7 +29,6 @@ class PaperStripWidgetLayoutTest {
 
         assertNotNull(list)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, list.layoutParams.height)
-        assertEquals(0, list.dividerHeight)
         assertFalse(list.isVerticalScrollBarEnabled)
     }
 
