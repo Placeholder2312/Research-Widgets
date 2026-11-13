@@ -7,12 +7,11 @@ Independent Android companion for the customized Aftergleam fork.
 - UI: native Android AppWidget, RemoteViews and StackView
 - Network permissions: none
 - Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
-- Development branch: `feature/aftergleam-integration`
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row, one paper per card, vertical StackView navigation plus accessible previous/next controls. Configure each instance for Recommended or Saved.
-2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
+1. **Research Paper Strip** — approximately five columns by one row. Shows one full-width paper title at a time in the Nothing Classic style (light/dark follows the system); swipe up or down to move through papers (Android StackView). A dot meter shows position (one dot per paper up to 7, proportional beyond that) with the current one in red. On Android 12+ the stack is enlarged to widget/0.9 and each card is sized explicitly, because StackView measures cards with `AT_MOST` and would otherwise shrink them to their text. Tapping a title opens that paper in Aftergleam via an in-app trampoline that reports failures. Configure each instance for Recommended or Saved.
+2. **Aftergleam tile** — approximately 2×2, Nothing Classic card with the Aftergleam artwork, opens the customized app.
 
 ## Build
 
@@ -31,17 +30,16 @@ The companion build uses this key for debug and release when configured. The Aft
 
 Install the customized Aftergleam fork before Research Widgets so Android knows the custom permission owner. The official Aftergleam application does not expose this API.
 
-## Current status
+## CI
 
-The native app, provider client, both widgets, per-instance configuration, protected refresh receiver, boot/app-replacement refresh, and widget-ID restore handling are on the feature branch. CI has successfully run `testDebugUnitTest` and `assembleDebug`; the latest CI APK uses the runner's default debug key unless the shared-keystore secrets above are configured. Real two-app signature-permission testing, emulator interaction tests and Samsung One UI gesture testing remain pending.
+GitHub Actions builds are manual-only. The workflow requires the shared keystore secrets, validates the keystore before compilation and prints the certificate fingerprint used by the APK signing step. The APK signature is verified before the artifact is uploaded. The test job also renders widget screenshots at compact, standard and resized dimensions for visual inspection.
 
-## Optional CI signing for cross-app IPC
 
-To make the GitHub Actions debug APK use the same certificate as Aftergleam, add these four Actions secrets to **both repositories** with identical values:
+## Download APK
 
-- `RESEARCH_WIDGETS_KEYSTORE_BASE64`: base64 encoding of the private `.jks` keystore file (the key itself is never committed)
-- `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`
-- `RESEARCH_WIDGETS_KEY_ALIAS`
-- `RESEARCH_WIDGETS_KEY_PASSWORD`
+- **[Download Research Widgets v1.3.3 APK](https://github.com/Placeholder2312/Research-Widgets/blob/apk-downloads/downloads/Research-Widgets-v1.3.3-debug.apk?raw=true)**
+- Version code: 7
+- APK size: 935,148 bytes
+- SHA-256: `61dc31bc314c6a6ac57b3aeaf94aae83aff7271393ef559f4fcbec92a794ad27`
 
-When the base64 secret is present, CI decodes the keystore into the temporary runner directory and signs the debug APK with it. Without these secrets, CI still builds a debug APK using that repository's generated debug key, which is suitable for build validation but **cannot pass signature-level IPC** with the other app.
+Build provenance: this APK was built successfully and signed from branch `fix/stackview-full-width-cards` at commit `00ad2644dc107a92fcb257e5bfd25ce6e4dfc13d`. It is not a build of `feature/aftergleam-integration`; that branch was at v1.3.0 when checked.

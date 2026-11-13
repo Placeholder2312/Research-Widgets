@@ -14,7 +14,7 @@ import com.placeholder2312.researchwidgets.data.WidgetPreferences
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-class PaperStackRemoteViewsService : RemoteViewsService() {
+class PaperStripRemoteViewsService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {
         val widgetId = intent.getIntExtra(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
@@ -39,8 +39,8 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
                 emptyList()
             } else {
                 PaperProviderClient.read(
-                    this@PaperStackRemoteViewsService,
-                    WidgetPreferences.mode(this@PaperStackRemoteViewsService, widgetId)
+                    this@PaperStripRemoteViewsService,
+                    WidgetPreferences.mode(this@PaperStripRemoteViewsService, widgetId)
                 ).papers
             }
         }
@@ -49,9 +49,9 @@ class PaperStackRemoteViewsService : RemoteViewsService() {
 
         override fun getViewAt(position: Int): RemoteViews? {
             val paper = papers.getOrNull(position) ?: return null
-            val options = AppWidgetManager.getInstance(this@PaperStackRemoteViewsService)
+            val options = AppWidgetManager.getInstance(this@PaperStripRemoteViewsService)
                 .getAppWidgetOptions(widgetId)
-            val (width, height) = PaperStripWidgetProvider.sizeDp(this@PaperStackRemoteViewsService, options)
+            val (width, height) = PaperStripWidgetProvider.sizeDp(this@PaperStripRemoteViewsService, options)
             val count = papers.size
             val showDots = count > 1 && height >= 56
 

@@ -108,7 +108,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 if (width < 140) 9f else if (width < 190) 10f else 12f
             )
 
-            val service = Intent(context, PaperStackRemoteViewsService::class.java).apply {
+            val service = Intent(context, PaperStripRemoteViewsService::class.java).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }

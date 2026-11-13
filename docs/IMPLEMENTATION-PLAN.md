@@ -4,7 +4,7 @@
 
 ### Phase 0 — repository and contract audit (complete)
 - Keep the original upstream read-only.
-- Work only on `feature/research-widgets-integration` in the Aftergleam fork and `feature/aftergleam-integration` in this repository.
+- Work on the Aftergleam integration and companion app repositories.
 - Freeze provider API v1 fields and permission name before building the companion against it.
 
 ### Phase 1 — Aftergleam provider and handoff (implemented; automated CI green)
@@ -13,42 +13,27 @@
 - Expose only the seven documented metadata columns through a signature-protected, read-only ContentProvider.
 - Open a paper through the signature-protected PaperOpenActivity trampoline, not by exporting MainActivity as a new API.
 - Invalidate the two feed URIs and send a package-targeted, signature-protected update broadcast after digest, save/unsave, import, restore, and notification-save writes.
-- Current automated coverage: feed order, saved order, empty feeds, unsupported path/selection/projection, write rejection, ID validation, and permission declaration metadata.
 
-### Phase 2 — companion widgets and settings (implemented scaffold; automated CI green)
+### Phase 2 — companion widgets and settings (implemented)
 - Native AppWidget/RemoteViews app with package `com.placeholder2312.researchwidgets`.
-- Paper Strip uses StackView, per-instance Recommended/Saved preferences, empty/disconnected states, and previous/next controls.
+- Paper Strip uses Android StackView for up/down swipe paging, enlarged to widget/0.9 on Android 12+ with explicitly sized cards so one full-width title shows at a time (the back cards sit outside the widget and are clipped).
+- One rounded Nothing-style shell; position dots on each card (proportional meter beyond 7 papers); taps go through an in-app trampoline to Aftergleam.
+- Keep per-instance Recommended/Saved preferences, empty/disconnected states, title typography, red position dots, dark/light colours and dot-matrix previous/next controls.
 - Decorative Aftergleam tile uses the supplied brand mark and opens the customized fork.
 - Companion receiver handles protected data-change notifications and refreshes widgets; boot/update lifecycle handling restores widget state.
 
-### Phase 3 — shared signing and cross-app integration (blocked on owner-provided secret)
+### Phase 3 — shared signing and cross-app integration (shared key configured)
 - Use one locally controlled release keystore for both applications.
 - Configure identical `RESEARCH_WIDGETS_KEYSTORE_BASE64`, `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`, `RESEARCH_WIDGETS_KEY_ALIAS`, and `RESEARCH_WIDGETS_KEY_PASSWORD` Actions secrets in both repositories.
-- Re-run both CI workflows and compare APK signer certificate SHA-256 fingerprints.
-- Install both APKs signed by that certificate and verify provider query succeeds; verify an APK signed with a different certificate is denied.
-- Verify the explicit paper-open trampoline opens the requested cached paper.
+- CI validates the same keystore in both repositories and verifies each APK's signature before upload.
 
-### Phase 4 — robustness and device verification (pending)
-- Add instrumentation coverage for actual cross-package permission grant/denial, lifecycle, and open-paper routing.
-- Exercise StackView vertical gestures, button fallback, resizing, multiple instances, empty feed, source app missing, process restart, and app update on an emulator.
-- Test the same interactions on Samsung One UI; launchers can differ in StackView gesture handling and grid sizing.
-- Confirm database migrations and JSON backup/restore regression tests remain green.
+### Phase 4 — robustness and visual verification (emulated visual pass complete; device check pending)
+- The earlier Robolectric flipper/chevron tests were removed with the flipper; the StackView widget has not yet been verified on a physical Samsung One UI device.
+- Render the real widget layouts with Robolectric at compact (360×56 dp), standard (420×88 dp), and taller (420×96 dp) dimensions using native graphics.
+- Physical Samsung One UI verification remains necessary because launcher hosts can differ.
 
-### Phase 5 — migration and release (not started; user-controlled)
+### Phase 5 — migration and release (user-controlled)
 - Do not uninstall or modify the official installation automatically.
 - User exports and verifies JSON backup, then chooses when to replace the official package.
 - Restore backup into the custom fork; cached paper metadata is refetched and is not included in JSON.
 - Install companion, validate both feeds and widgets, then consider migration complete.
-- Do not merge to either main branch or publish a release without explicit user approval.
-
-## Latest verified CI
-- Aftergleam fork branch `feature/research-widgets-integration`, commit `72563b15f46d76e2555e57797c546a077ff126fb`: workflow run [43199854746](https://github.com/Placeholder2312/Aftergleam-For-Widgets-/actions/runs/43199854746) succeeded; `testDebugUnitTest` and `assembleDebug` completed and artifact `aftergleam-widget-fork-debug-apk` was uploaded.
-- Companion branch `feature/aftergleam-integration`, commit `92338ddba6905481bb85b77baaa242f2be88f0be`: workflow run [43201882824](https://github.com/Placeholder2312/Research-Widgets/actions/runs/43201882824) succeeded; `testDebugUnitTest` and `assembleDebug` completed and artifact `research-widgets-debug-apk` was uploaded.
-- Both logs explicitly report that no shared IPC keystore was configured. These are build-validation APKs only; they are not mutually authorized for signature-level IPC.
-
-## Current risks / release blockers
-- The current Robolectric permission test checks the manifest declaration, not an actual cross-package denial/allowance. Add instrumentation tests for this.
-- CI has not yet built with the same signing identity in both repositories.
-- No emulator or physical Samsung One UI verification is recorded.
-- The widget's visual size and StackView swipe behavior must be verified on the target launcher.
-- Both main branches remain unchanged; no release or migration has occurred.
