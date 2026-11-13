@@ -37,7 +37,7 @@ jobs:
           fi
           keytool -list -keystore "$RUNNER_TEMP/research-widgets-ipc.jks" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" >/dev/null
           echo "RESEARCH_WIDGETS_KEYSTORE=$RUNNER_TEMP/research-widgets-ipc.jks" >> "$GITHUB_ENV"
-          echo "Shared IPC keystore received, decoded, and validated."
+          echo "Shared IPC keystore received and validated."
           keytool -list -v -keystore "$RUNNER_TEMP/research-widgets-ipc.jks" -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | grep 'SHA256:'
       - name: Build and test
         env:
@@ -45,6 +45,13 @@ jobs:
           RESEARCH_WIDGETS_KEY_ALIAS: ${{ secrets.RESEARCH_WIDGETS_KEY_ALIAS }}
           RESEARCH_WIDGETS_KEY_PASSWORD: ${{ secrets.RESEARCH_WIDGETS_KEY_PASSWORD }}
         run: ./gradlew --no-daemon testDebugUnitTest assembleDebug
+      - name: Upload widget visual previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: widget-visual-previews
+          path: '**/widget-previews/*.png'
+          if-no-files-found: warn
       - name: Verify APK signature
         run: |
           set -euo pipefail

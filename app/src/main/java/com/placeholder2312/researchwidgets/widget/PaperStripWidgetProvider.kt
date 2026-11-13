@@ -20,12 +20,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         ids.forEach { updateWidget(context, manager, it) }
     }
 
-    override fun onAppWidgetOptionsChanged(
-        context: Context,
-        manager: AppWidgetManager,
-        id: Int,
-        options: android.os.Bundle
-    ) {
+    override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: android.os.Bundle) {
         updateWidget(context, manager, id)
     }
 
@@ -60,10 +55,7 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    /**
-     * ListView owns the current scroll position, including changes made by a swipe.
-     * Move relative to that live position instead of keeping a second, stale index in preferences.
-     */
+    /** Use StackView's own current position so arrows stay in sync with card swipes. */
     private fun move(context: Context, id: Int, delta: Int) {
         if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
 
@@ -73,17 +65,16 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         ).papers.size
         if (count <= 1) return
 
-        val scroll = RemoteViews(context.packageName, R.layout.widget_paper_strip).apply {
-            setRelativeScrollPosition(R.id.paper_list, delta)
-        }
-        AppWidgetManager.getInstance(context).partiallyUpdateAppWidget(id, scroll)
+        val navigation = RemoteViews(context.packageName, R.layout.widget_paper_strip)
+        if (delta > 0) navigation.showNext(R.id.paper_stack) else navigation.showPrevious(R.id.paper_stack)
+        AppWidgetManager.getInstance(context).partiallyUpdateAppWidget(id, navigation)
     }
 
     companion object {
         private const val ACTION_NEXT = "com.placeholder2312.researchwidgets.action.PAPER_NEXT"
         private const val ACTION_PREVIOUS = "com.placeholder2312.researchwidgets.action.PAPER_PREVIOUS"
 
-        /** Below this size the chevrons are hidden so the title keeps usable width. */
+        /** Below this size the chevrons are hidden to preserve a clear title area. */
         internal fun isCompact(widthDp: Int, heightDp: Int): Boolean = widthDp < 210 || heightDp < 52
 
         fun refreshAll(context: Context) {
@@ -115,14 +106,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             val compact = isCompact(width, height)
             val canNavigate = !compact && count > 1
 
-            views.setViewVisibility(
-                R.id.previous_button,
-                if (canNavigate) View.VISIBLE else View.GONE
-            )
-            views.setViewVisibility(
-                R.id.next_button,
-                if (canNavigate) View.VISIBLE else View.GONE
-            )
+            views.setViewVisibility(R.id.previous_button, if (canNavigate) View.VISIBLE else View.GONE)
+            views.setViewVisibility(R.id.next_button, if (canNavigate) View.VISIBLE else View.GONE)
             views.setViewVisibility(
                 R.id.empty_dots,
                 if (width >= 120 && height >= 64) View.VISIBLE else View.GONE
@@ -141,8 +126,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse("researchwidgets://paper-strip/$id")
             }
-            views.setRemoteAdapter(R.id.paper_list, service)
-            views.setEmptyView(R.id.paper_list, R.id.empty_state)
+            views.setRemoteAdapter(R.id.paper_stack, service)
+            views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
             val openPaper = Intent(AftergleamContract.ACTION_OPEN_PAPER).setComponent(
                 ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT)
@@ -154,13 +139,13 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
                 openPaper,
                 PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
             )
-            views.setPendingIntentTemplate(R.id.paper_list, template)
+            views.setPendingIntentTemplate(R.id.paper_stack, template)
 
             views.setOnClickPendingIntent(R.id.previous_button, movePending(context, id, ACTION_PREVIOUS))
             views.setOnClickPendingIntent(R.id.next_button, movePending(context, id, ACTION_NEXT))
 
             manager.updateAppWidget(id, views)
-            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_list)
+            manager.notifyAppWidgetViewDataChanged(id, R.id.paper_stack)
         }
 
         private fun movePending(context: Context, id: Int, action: String): PendingIntent {

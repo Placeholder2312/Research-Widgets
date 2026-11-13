@@ -2,14 +2,15 @@ package com.placeholder2312.researchwidgets.widget
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ListView
+import android.widget.StackView
 import androidx.test.core.app.ApplicationProvider
 import com.placeholder2312.researchwidgets.R
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -21,25 +22,29 @@ class PaperStripWidgetLayoutTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
-    fun stripUsesAFullViewportListInsteadOfTheMultiCardStackView() {
+    fun paperStripUsesNativeStackViewCardNavigation() {
         val parent = FrameLayout(context)
         val widget = LayoutInflater.from(context).inflate(R.layout.widget_paper_strip, parent, false)
+        val stack = widget.findViewById<StackView>(R.id.paper_stack)
 
-        val list = widget.findViewById<ListView>(R.id.paper_list)
-
-        assertNotNull(list)
-        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, list.layoutParams.height)
-        assertFalse(list.isVerticalScrollBarEnabled)
+        assertNotNull(stack)
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, stack.layoutParams.width)
+        assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, stack.layoutParams.height)
     }
 
     @Test
-    fun eachPaperRowFillsTheViewportAndKeepsTheNothingTitleAndDots() {
+    fun shellClipsStackCardsToTheNothingRoundedOutline() {
         val parent = FrameLayout(context)
+        val widget = LayoutInflater.from(context).inflate(R.layout.widget_paper_strip, parent, false)
         val card = LayoutInflater.from(context).inflate(R.layout.widget_paper_card, parent, false)
 
+        val shell = widget as ViewGroup
+        assertTrue(shell.getClipChildren())
+        assertTrue(shell.getClipToPadding())
+        assertTrue(widget.clipToOutline)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.width)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.height)
+        assertEquals(View.VISIBLE, card.findViewById<View>(R.id.dot_row).visibility)
         assertNotNull(card.findViewById(R.id.paper_title))
-        assertNotNull(card.findViewById(R.id.dot_row))
     }
 }

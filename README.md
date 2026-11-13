@@ -4,16 +4,14 @@ Independent Android companion for the customized Aftergleam fork.
 
 - Application ID: `com.placeholder2312.researchwidgets`
 - Minimum SDK: 26; target SDK: 37
-- UI: native Android AppWidget, RemoteViews and a full-viewport ListView
+- UI: native Android AppWidget, RemoteViews and StackView
 - Network permissions: none
 - Provider API: `si.jakobkreft.aftergleam.researchwidgets`, v1
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row. It shows one full-viewport paper title at a time; swipe vertically to move to the next or previous title. Nothing Classic styling, position dots and dot-matrix previous/next controls are retained. Configure each instance for Recommended or Saved.
+1. **Research Paper Strip** — approximately five columns by one row. Flick vertically between paper cards using Android's native StackView interaction. The outer widget keeps one consistent Nothing rounded shell; transparent paper rows and parent outline clipping prevent moving cards from changing the shell edges. Titles are inset from the dot-matrix chevrons so they remain legible during swipes. Claude's Nothing title typography, red position dots and dark/light colours are retained. Configure each instance for Recommended or Saved.
 2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
-
-The paper rows fill the widget's available height so the launcher does not fan several titles across the strip. The ListView scrolls vertically; the side chevrons provide an additional one-paper navigation control.
 
 ## Build
 
@@ -34,4 +32,4 @@ Install the customized Aftergleam fork before Research Widgets so Android knows 
 
 ## CI
 
-GitHub Actions builds are manual-only. The workflow requires the shared keystore secrets, validates the keystore before compilation and prints the certificate fingerprint used by the APK signing step. The APK signature is verified before the artifact is uploaded.
+GitHub Actions builds are manual-only. The workflow requires the shared keystore secrets, validates the keystore before compilation and prints the certificate fingerprint used by the APK signing step. The APK signature is verified before the artifact is uploaded. The test job also renders widget screenshots at compact, standard and resized dimensions for visual inspection.
