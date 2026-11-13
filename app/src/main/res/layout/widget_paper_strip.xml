@@ -19,7 +19,7 @@
         android:overScrollMode="never"
         android:padding="0dp"
         android:scrollbars="none"
-        android:verticalFadingEdgeEnabled="false" />
+        />
 
     <LinearLayout
         android:id="@+id/empty_state"
