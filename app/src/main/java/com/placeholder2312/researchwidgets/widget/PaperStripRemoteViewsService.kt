@@ -97,7 +97,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 paper.title,
                 byline,
                 "Paper ${position + 1} of $count",
-                "Swipe up or down to browse papers. Open in Aftergleam."
+                "Use the previous and next controls to browse papers. Open in Aftergleam."
             ).filter { it.isNotBlank() }.joinToString(". ") + "."
             views.setContentDescription(R.id.paper_card, description)
             views.setOnClickFillInIntent(
