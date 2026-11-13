@@ -10,7 +10,7 @@ Independent Android companion for the customized Aftergleam fork.
 
 ## Widgets
 
-1. **Research Paper Strip** — approximately five columns by one row. Flick vertically between paper cards using Android's native StackView interaction. The outer widget keeps one consistent Nothing rounded shell; the stack is clipped to that outline so moving cards and chevrons cannot distort the widget edges. Claude's Nothing title typography, red position dots, dark/light colours and dot-matrix chevrons are retained. Configure each instance for Recommended or Saved.
+1. **Research Paper Strip** — approximately five columns by one row. Flick vertically between paper cards using Android's native StackView interaction. The outer widget keeps one consistent Nothing rounded shell; transparent paper rows and parent outline clipping prevent moving cards from changing the shell edges. Titles are inset from the dot-matrix chevrons so they remain legible during swipes. Claude's Nothing title typography, red position dots and dark/light colours are retained. Configure each instance for Recommended or Saved.
 2. **Aftergleam tile** — approximately 2×2, decorative background and the actual Aftergleam launcher foreground artwork, opens the customized app.
 
 ## Build
