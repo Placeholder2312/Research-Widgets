@@ -41,8 +41,9 @@ class PaperStripWidgetVisualTest {
         val stack = widget.findViewById<StackView>(R.id.paper_stack)
 
         assertNotNull(stack)
-        assertTrue(widget.clipChildren)
-        assertTrue(widget.clipToPadding)
+        val shell = widget as android.view.ViewGroup
+        assertTrue(shell.getClipChildren())
+        assertTrue(shell.getClipToPadding())
         assertTrue(widget.clipToOutline)
 
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
