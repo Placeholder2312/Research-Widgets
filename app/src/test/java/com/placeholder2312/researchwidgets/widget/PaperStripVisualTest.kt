@@ -3,6 +3,8 @@ package com.placeholder2312.researchwidgets.widget
 import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Path
+import android.graphics.RectF
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
@@ -91,19 +93,37 @@ class PaperStripWidgetVisualTest {
         val density = view.resources.displayMetrics.density
         val width = (widthDp * density).toInt()
         val height = (heightDp * density).toInt()
+
+        // Drain the Activity's first layout, then size the host to the widget's requested launcher cell.
+        shadowOf(android.os.Looper.getMainLooper()).idle()
         view.measure(
             MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
         )
         view.layout(0, 0, width, height)
-        shadowOf(android.os.Looper.getMainLooper()).idle()
 
-        println("Widget preview view: attached=${view.isAttachedToWindow}, measured=${view.measuredWidth}x${view.measuredHeight}, layout=${view.width}x${view.height}")
+        // Robolectric does not apply a View background outline when drawing an attached RemoteViews host.
+        // The production widget keeps clipToOutline=true; emulate that same rounded host clip in this bitmap.
+        val widgetRoot = (view as ViewGroup).getChildAt(0)
+        widgetRoot.clipToOutline = false
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        view.draw(Canvas(bitmap))
+        val canvas = Canvas(bitmap)
+        val radius = 28f * density
+        val outline = Path().apply {
+            addRoundRect(
+                RectF(0f, 0f, width.toFloat(), height.toFloat()),
+                radius,
+                radius,
+                Path.Direction.CW
+            )
+        }
+        canvas.save()
+        canvas.clipPath(outline)
+        view.draw(canvas)
+        canvas.restore()
         val directory = File("build/widget-previews")
         directory.mkdirs()
-        println("Widget preview screenshot: ${File(directory, name).absolutePath}")
+        println("Widget preview screenshot: ${File(directory, name).absolutePath} (${width}x${height})")
         FileOutputStream(File(directory, name)).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         bitmap.recycle()
     }
