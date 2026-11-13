@@ -6,4 +6,6 @@
     <color name="nothing_muted">#6B6B6B</color>
     <color name="nothing_red">#D71921</color>
     <color name="nothing_dot_idle">#596B6B6B</color>
+    <color name="nothing_page">#FFFFFF</color>
+    <color name="nothing_outline">#1F000000</color>
 </resources>
