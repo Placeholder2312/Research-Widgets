@@ -38,8 +38,9 @@ class PaperStripWidgetLayoutTest {
         val widget = LayoutInflater.from(context).inflate(R.layout.widget_paper_strip, parent, false)
         val card = LayoutInflater.from(context).inflate(R.layout.widget_paper_card, parent, false)
 
-        assertTrue(widget.clipChildren)
-        assertTrue(widget.clipToPadding)
+        val shell = widget as ViewGroup
+        assertTrue(shell.getClipChildren())
+        assertTrue(shell.getClipToPadding())
         assertTrue(widget.clipToOutline)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.width)
         assertEquals(ViewGroup.LayoutParams.MATCH_PARENT, card.layoutParams.height)
