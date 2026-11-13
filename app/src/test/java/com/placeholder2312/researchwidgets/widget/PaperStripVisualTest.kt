@@ -48,6 +48,7 @@ class PaperStripWidgetVisualTest {
 
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
         stack.adapter = PreviewAdapter(activity, titles)
+        activity.setContentView(widget)
         render(widget, WIDTH_DP, HEIGHT_DP, "paper-strip-stack-current.png")
         assertEquals(0, stack.displayedChild)
 
@@ -69,6 +70,7 @@ class PaperStripWidgetVisualTest {
         val stack = widget.findViewById<StackView>(R.id.paper_stack)
         widget.findViewById<View>(R.id.empty_state).visibility = View.GONE
         stack.adapter = PreviewAdapter(activity, titles)
+        activity.setContentView(widget)
 
         assertNotNull(widget.findViewById<ImageView>(R.id.previous_button))
         assertNotNull(widget.findViewById<ImageView>(R.id.next_button))
@@ -89,8 +91,9 @@ class PaperStripWidgetVisualTest {
 
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         view.draw(Canvas(bitmap))
-        val directory = File("app/build/widget-previews")
+        val directory = File("build/widget-previews")
         directory.mkdirs()
+        println("Widget preview screenshot: ${File(directory, name).absolutePath}")
         FileOutputStream(File(directory, name)).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         bitmap.recycle()
     }
