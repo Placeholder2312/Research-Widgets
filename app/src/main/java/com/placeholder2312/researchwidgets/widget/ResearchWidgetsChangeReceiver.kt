@@ -10,6 +10,7 @@ class ResearchWidgetsChangeReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == AftergleamContract.ACTION_DATA_CHANGED) {
             PaperStripWidgetProvider.refreshAll(context)
+            TapPaperWidgetProvider.refreshAll(context)
             DigestTileWidgetProvider.refreshAll(context)
         }
     }
