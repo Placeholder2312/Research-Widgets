@@ -60,14 +60,18 @@ class WidgetConfigActivity : Activity() {
         styleGroup.check(if (WidgetPreferences.style(this, widgetId) == WidgetStyle.RAIL) ID_RAIL else ID_ROW)
         root.addView(styleGroup)
 
-        val status = PaperProviderClient.read(this, FeedMode.RECOMMENDED).message
-        root.addView(TextView(this).apply {
-            text = status
+        val status = TextView(this).apply {
+            text = "Checking Aftergleam…"
             typeface = mono
             textSize = 12f
             setTextColor(muted)
             setPadding(0, dp(18), 0, dp(18))
-        })
+        }
+        root.addView(status)
+        Thread {
+            val message = PaperProviderClient.read(this, FeedMode.RECOMMENDED).message
+            runOnUiThread { if (!isDestroyed) status.text = message }
+        }.start()
 
         val actions = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
         actions.addView(

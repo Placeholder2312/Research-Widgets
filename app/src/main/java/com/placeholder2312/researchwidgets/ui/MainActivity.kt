@@ -32,9 +32,9 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.add_strip).setOnClickListener { pin(PaperStripWidgetProvider::class.java) }
         findViewById<Button>(R.id.add_tile).setOnClickListener { pin(AftergleamTileWidgetProvider::class.java) }
         findViewById<TextView>(R.id.app_version).text = versionLabel()
-        refreshStatus()
     }
 
+    /** Runs after onCreate too, so this is also the first status load. */
     override fun onResume() {
         super.onResume()
         refreshStatus()
@@ -61,9 +61,14 @@ class MainActivity : Activity() {
     private fun buildNumber(info: PackageInfo): Long =
         if (Build.VERSION.SDK_INT >= 28) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
 
+    /** The provider query runs off the main thread so a slow Aftergleam can't freeze the screen. */
     private fun refreshStatus() {
-        findViewById<TextView>(R.id.connection_status).text =
-            PaperProviderClient.read(this, FeedMode.RECOMMENDED).message
+        Thread {
+            val message = PaperProviderClient.read(this, FeedMode.RECOMMENDED).message
+            runOnUiThread {
+                if (!isDestroyed) findViewById<TextView>(R.id.connection_status).text = message
+            }
+        }.start()
         bindWidgetRow(PaperStripWidgetProvider::class.java, R.id.strip_count, R.id.strip_dot)
         bindWidgetRow(AftergleamTileWidgetProvider::class.java, R.id.tile_count, R.id.tile_dot)
     }
