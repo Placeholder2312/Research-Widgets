@@ -1,14 +1,12 @@
 package com.placeholder2312.researchwidgets.widget
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
-import com.placeholder2312.researchwidgets.data.AftergleamContract
+import com.placeholder2312.researchwidgets.data.AftergleamLinks
 import com.placeholder2312.researchwidgets.data.FeedMode
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.ProviderState
@@ -53,13 +51,7 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
                 description = "$label. Open Aftergleam."
             }
 
-            val launch = Intent().setComponent(
-                ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PACKAGE + ".MainActivity")
-            )
-            val tap = PendingIntent.getActivity(
-                context, REQUEST_BASE + id, launch,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+            val tap = PendingIntents.activity(context, REQUEST_BASE + id, AftergleamLinks.launchApp())
             views.setOnClickPendingIntent(R.id.digest_tile, tap)
             views.setContentDescription(R.id.digest_tile, description)
             manager.updateAppWidget(id, views)

@@ -88,7 +88,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
             // RAIL: dots run down the right edge and cost horizontal space; a counter sits above the title.
             val showDots = count > 1 && if (rail) height >= 40 else height >= 56
             val showCounter = count > 1 && if (rail) height >= 72 else (showDots && count > MAX_DOTS)
-            val railDots = if (rail) ((height - 2 * verticalPaddingDp + 5) / RAIL_DOT_STEP_DP).coerceIn(0, MAX_DOTS) else MAX_DOTS
+            val railDots = if (rail) ((height - 2 * verticalPaddingDp - RAIL_CORNER_CLEARANCE_DP + RAIL_GAP_DP) / RAIL_DOT_STEP_DP).coerceIn(0, MAX_DOTS) else MAX_DOTS
             val dotsBlockDp = if (!rail && showDots) DOT_BLOCK_DP else 0
             val counterBlockDp = if (rail && showCounter) COUNTER_BLOCK_DP else 0
             val fittingLines = ((height - 2 * verticalPaddingDp - dotsBlockDp - counterBlockDp) / (titleSize * LINE_HEIGHT_FACTOR)).toInt()
@@ -188,7 +188,9 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
         const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
         const val LINE_HEIGHT_FACTOR = 1.3f
         const val MAX_DOTS = 7
-        const val RAIL_DOT_STEP_DP = 11 // 6dp dot + 5dp gap
+        const val RAIL_GAP_DP = 4
+        const val RAIL_DOT_STEP_DP = 9 // 5dp dot + 4dp gap
+        const val RAIL_CORNER_CLEARANCE_DP = 12 // keeps the rail off the rounded corners
         const val COUNTER_BLOCK_DP = 14 // 10sp mono line + 4dp margin
         val DOT_IDS = intArrayOf(
             R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6

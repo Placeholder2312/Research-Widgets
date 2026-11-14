@@ -118,6 +118,19 @@
                 android:text="Check connection"
                 android:textColor="@color/nothing_ink"
                 android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/open_paper"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/nothing_button_outline"
+                android:fontFamily="monospace"
+                android:letterSpacing="0.1"
+                android:stateListAnimator="@null"
+                android:text="Test: open newest paper"
+                android:textColor="@color/nothing_ink"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView

@@ -2,6 +2,7 @@ package com.placeholder2312.researchwidgets.ui
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -13,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.placeholder2312.researchwidgets.R
 import com.placeholder2312.researchwidgets.data.AftergleamContract
+import com.placeholder2312.researchwidgets.data.AftergleamLinks
 import com.placeholder2312.researchwidgets.data.FeedMode
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.widget.AftergleamTileWidgetProvider
@@ -26,6 +28,7 @@ class MainActivity : Activity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.check_connection).setOnClickListener { refreshStatus() }
+        findViewById<Button>(R.id.open_paper).setOnClickListener { openNewestPaper() }
         findViewById<Button>(R.id.refresh_widgets).setOnClickListener {
             PaperStripWidgetProvider.refreshAll(this)
             DigestTileWidgetProvider.refreshAll(this)
@@ -91,13 +94,43 @@ class MainActivity : Activity() {
         )
     }
 
+    /**
+     * Opens the first paper of the feed through the same intent the widgets use. If this works but a widget
+     * tap doesn't, the problem is in the launcher hand-off, not in Aftergleam or the signing key.
+     */
+    private fun openNewestPaper() {
+        Thread {
+            val read = PaperProviderClient.read(this, FeedMode.RECOMMENDED)
+            val paper = read.papers.firstOrNull()
+                ?: PaperProviderClient.read(this, FeedMode.SAVED).papers.firstOrNull()
+            runOnUiThread {
+                if (isDestroyed) return@runOnUiThread
+                if (paper == null) {
+                    toast(if (read.connected) "No papers to open yet" else read.message)
+                    return@runOnUiThread
+                }
+                try {
+                    startActivity(AftergleamLinks.openPaper(paper.id))
+                } catch (e: SecurityException) {
+                    toast("Aftergleam refused the request (signing key mismatch?)")
+                } catch (e: ActivityNotFoundException) {
+                    toast("Aftergleam's paper-open screen was not found")
+                } catch (e: Exception) {
+                    toast("Couldn't open the paper in Aftergleam")
+                }
+            }
+        }.start()
+    }
+
+    private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+
     /** Asks the launcher to add the widget; not every launcher supports this. */
     private fun pin(provider: Class<*>) {
         val manager = AppWidgetManager.getInstance(this)
         val supported = manager.isRequestPinAppWidgetSupported &&
             manager.requestPinAppWidget(ComponentName(this, provider), null, null)
         if (!supported) {
-            Toast.makeText(this, "Add it from your launcher's widget picker", Toast.LENGTH_LONG).show()
+            toast("Add it from your launcher's widget picker")
         }
     }
 }

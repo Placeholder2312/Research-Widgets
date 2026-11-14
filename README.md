@@ -31,7 +31,7 @@ Design follows the Nothing "Classic" look: light/dark from the system, monospace
 - **Full-width paging inside RemoteViews limits.** Widgets can't run arbitrary views, so swiping uses the platform `StackView`. It measures cards with `AT_MOST` (cards shrink to their text) and renders back cards offset to one side. The fix: on Android 12+ the provider enlarges the stack to `widget / 0.9` (StackView gives children 90% of its size), anchors it bottom-start so the back cards fall outside and are clipped, and sizes every card explicitly to the widget minus StackView's built-in frame padding.
 - **Layout fitting.** Title size comes from width tiers; the number of title lines (2/3/5 via separate layouts) is computed from the widget height after reserving space for dots or the counter. Row and Rail each have their own set.
 - **Honest position indicator.** The dot meter never shows a position the widget isn't at: 1:1 up to 7 papers, proportional above, with a numeric counter and a screen-reader description ("Paper 3 of 12").
-- **Reliable taps.** Launchers sending a mutable `PendingIntent` straight to another app fail silently. Taps go to an in-app trampoline activity that forwards to Aftergleam and shows a message on failure (for example a signing-key mismatch).
+- **Reliable taps.** Android 15+ no longer lets a PendingIntent's creator lend background-launch rights unless it opts in, and a trampoline activity that starts another app's activity can be blocked silently. Widget taps therefore use a `PendingIntent` that targets Aftergleam's paper-open screen directly (explicit component, mutable template plus a per-card fill-in with the paper id) and opt in to the creator launch privilege. A "Test: open newest paper" button in the app uses the same intent, so a broken hand-off can be told apart from a launcher problem.
 - **Signature-protected IPC.** Papers are read from a read-only `ContentProvider` guarded by a signature permission; no network permission and no polling. Aftergleam pushes a protected change broadcast and the widgets re-query.
 - **Small and dependency-free.** Plain Android SDK, no third-party runtime libraries, roughly a thousand lines of Kotlin. Provider reads are cached for a few seconds so the widget and its list adapter share one query.
 
@@ -46,14 +46,13 @@ flowchart LR
     P -- sizes stack, sets adapter --> S[StackView]
     C --> F[PaperStripRemoteViewsService<br/>RemoteViewsFactory]
     F -- one card per paper --> S
-    S -- tap --> O[OpenPaperActivity<br/>trampoline]
-    O --> A
+    S -- tap: PendingIntent + paper id --> A
 ```
 
 | Package | Role |
 | --- | --- |
 | `data/` | Provider contract, read-only client (never throws; returns a state and message), per-widget preferences |
-| `widget/` | Widget providers, the card factory, tap trampoline, boot/update and data-changed receivers |
+| `widget/` | Widget providers, the card factory, PendingIntent helper, boot/update and data-changed receivers |
 | `ui/` | Control-panel activity and the per-widget setup screen |
 
 ## Requirements

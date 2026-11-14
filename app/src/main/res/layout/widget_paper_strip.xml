@@ -3,7 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_card_bg"
-    android:clipChildren="true">
+    android:clipChildren="true"
+    android:clipToOutline="true"
+    android:outlineProvider="background">
 
     <!--
       Swipe up/down cycles papers. StackView gives its cards 90% of its own size and parks the

@@ -1,6 +1,5 @@
 package com.placeholder2312.researchwidgets.widget
 
-import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -14,6 +13,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
+import com.placeholder2312.researchwidgets.data.AftergleamLinks
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
@@ -113,15 +113,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.paper_stack, service)
             views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
-            // Taps go through our own trampoline, which forwards to Aftergleam and reports failures.
-            val openPaper = Intent(context, OpenPaperActivity::class.java)
-            val mutableFlag = if (Build.VERSION.SDK_INT >= 31) PendingIntent.FLAG_MUTABLE else 0
-            val template = PendingIntent.getActivity(
-                context,
-                10000 + id,
-                openPaper,
-                PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
-            )
+            // Taps go straight to Aftergleam's paper-open endpoint; each card adds its paper id.
+            val template = PendingIntents.activity(context, 10000 + id, AftergleamLinks.openPaperTemplate(), mutable = true)
             views.setPendingIntentTemplate(R.id.paper_stack, template)
 
             // No setDisplayedChild: the stack keeps whichever paper the user swiped to across refreshes.
