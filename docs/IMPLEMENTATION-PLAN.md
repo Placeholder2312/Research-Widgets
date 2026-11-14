@@ -18,7 +18,8 @@
 - Native AppWidget/RemoteViews app with package `com.placeholder2312.researchwidgets`.
 - Paper Strip uses Android StackView for up/down swipe paging, enlarged to widget/0.9 on Android 12+ with explicitly sized cards so one full-width title shows at a time (the back cards sit outside the widget and are clipped).
 - One rounded Nothing-style shell; position dots on each card (proportional meter beyond 7 papers); taps go through an in-app trampoline to Aftergleam.
-- Keep per-instance Recommended/Saved preferences, empty/disconnected states, title typography, red position dots, dark/light colours and dot-matrix previous/next controls.
+- Keep per-instance Recommended/Saved feed and Row/Rail style preferences, empty/disconnected states, title typography, red position dots and dark/light colours. Swiping replaces previous/next buttons.
+- Row style: dots under the title; Rail style: vertical dot rail on the swipe axis plus an NN/NN counter. A counter also appears in Row once there are more than 7 papers.
 - Decorative Aftergleam tile uses the supplied brand mark and opens the customized fork.
 - Companion receiver handles protected data-change notifications and refreshes widgets; boot/update lifecycle handling restores widget state.
 
@@ -27,10 +28,10 @@
 - Configure identical `RESEARCH_WIDGETS_KEYSTORE_BASE64`, `RESEARCH_WIDGETS_KEYSTORE_PASSWORD`, `RESEARCH_WIDGETS_KEY_ALIAS`, and `RESEARCH_WIDGETS_KEY_PASSWORD` Actions secrets in both repositories.
 - CI validates the same keystore in both repositories and verifies each APK's signature before upload.
 
-### Phase 4 — robustness and visual verification (emulated visual pass complete; device check pending)
-- The earlier Robolectric flipper/chevron tests were removed with the flipper; the StackView widget has not yet been verified on a physical Samsung One UI device.
-- Render the real widget layouts with Robolectric at compact (360×56 dp), standard (420×88 dp), and taller (420×96 dp) dimensions using native graphics.
-- Physical Samsung One UI verification remains necessary because launcher hosts can differ.
+### Phase 4 — robustness and verification (CI green; device check pending)
+- CI builds, runs the Robolectric unit tests (provider mapping, per-widget preferences, restore) and verifies the APK signature.
+- The earlier Robolectric screenshot/flipper tests were removed with the flipper; layout rendering is verified by eye on device.
+- Physical Samsung One UI verification of swipe, tap, full-width title and both styles is still required, because launcher hosts differ.
 
 ### Phase 5 — migration and release (user-controlled)
 - Do not uninstall or modify the official installation automatically.

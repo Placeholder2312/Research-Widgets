@@ -1,13 +1,29 @@
 package com.placeholder2312.researchwidgets.data
+
 import android.content.Context
-/** Per-widget settings: two widget instances can select different feeds. */
+
+/** Per-widget settings: two widget instances can use different feeds and styles. */
 object WidgetPreferences {
- private const val PREFS="widget_instances"
- private fun p(c:Context)=c.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
- private fun mk(id:Int)="mode_$id";private fun sk(id:Int)="style_$id"
- fun mode(c:Context,id:Int)=FeedMode.from(p(c).getString(mk(id),FeedMode.RECOMMENDED.key))
- fun setMode(c:Context,id:Int,m:FeedMode){p(c).edit().putString(mk(id),m.key).apply()}
- fun style(c:Context,id:Int)=WidgetStyle.from(p(c).getString(sk(id),null))
- fun setStyle(c:Context,id:Int,s:WidgetStyle){p(c).edit().putString(sk(id),s.key).apply()}
- fun clear(c:Context,id:Int){p(c).edit().remove(mk(id)).remove(sk(id)).apply()}
+    private const val PREFS = "widget_instances"
+
+    private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private fun modeKey(id: Int) = "mode_$id"
+    private fun styleKey(id: Int) = "style_$id"
+
+    fun mode(context: Context, id: Int) =
+        FeedMode.from(prefs(context).getString(modeKey(id), FeedMode.RECOMMENDED.key))
+
+    fun setMode(context: Context, id: Int, mode: FeedMode) {
+        prefs(context).edit().putString(modeKey(id), mode.key).apply()
+    }
+
+    fun style(context: Context, id: Int) = WidgetStyle.from(prefs(context).getString(styleKey(id), null))
+
+    fun setStyle(context: Context, id: Int, style: WidgetStyle) {
+        prefs(context).edit().putString(styleKey(id), style.key).apply()
+    }
+
+    fun clear(context: Context, id: Int) {
+        prefs(context).edit().remove(modeKey(id)).remove(styleKey(id)).apply()
+    }
 }
