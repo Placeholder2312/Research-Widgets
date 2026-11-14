@@ -8,8 +8,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_card_bg"
-    android:clickable="true"
-    android:focusable="true"
     android:minWidth="4000dp"
     android:minHeight="4000dp"
     android:paddingStart="16dp"
