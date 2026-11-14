@@ -1,6 +1,6 @@
 # Research Widgets
 
-Nothing-style Android home-screen widgets that put today's research papers one swipe away — a companion to a customized fork of the Aftergleam research-paper app.
+Nothing-style Android home-screen widgets that put today's research papers one swipe or tap away — a companion to a customized fork of the Aftergleam research-paper app.
 
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-100%25-7F52FF?logo=kotlin&logoColor=white)
@@ -11,7 +11,8 @@ Nothing-style Android home-screen widgets that put today's research papers one s
 
 | Widget | What you get |
 | --- | --- |
-| **Research Paper Strip** (about 5×1) | One paper title fills the widget. Swipe up/down to move through the feed, tap to open the paper in Aftergleam. Choose the **Recommended** digest or **Saved** papers per widget, and a **Row** or **Rail** look. |
+| **Research Paper Strip** (about 5×1) | Swipe up/down to move through papers; tap the current title to open it in Aftergleam. Choose the **Recommended** digest or **Saved** papers, and a **Row** or **Rail** look. |
+| **Paper Strip (No Swipe)** (about 5×1) | A separate plain widget: tap the paper to open it, or tap the right edge/dots/counter to advance. No swipe gesture. Supports the same feeds and Row/Rail looks. |
 | **Aftergleam tile** (about 2×2) | A static launcher tile that opens Aftergleam. |
 | **Digest tile** (about 2×2) | Inverted black/white tile with one big number. **Latest** counts today's digest (saved count underneath); **Downloaded** counts PDFs kept on the device (today's count underneath). Pick the mode per tile; long-press to reconfigure. Updates when Aftergleam's data changes; tap opens Aftergleam. |
 
@@ -28,7 +29,8 @@ Design follows the Nothing "Classic" look: light/dark from the system, monospace
 
 ## Engineering highlights
 
-- **Full-width paging inside RemoteViews limits.** Widgets can't run arbitrary views, so swiping uses the platform `StackView`. It measures cards with `AT_MOST` (cards shrink to their text) and renders back cards offset to one side. The fix: on Android 12+ the provider enlarges the stack to `widget / 0.9` (StackView gives children 90% of its size), anchors it bottom-start so the back cards fall outside and are clipped, and sizes every card explicitly to the widget minus StackView's built-in frame padding.
+- **Two independent strip designs.** `Research Paper Strip` keeps StackView swipe navigation; `Paper Strip (No Swipe)` is a separate plain RemoteViews widget with direct tap-to-open and tap-to-advance. Neither replaces the other.
+- **Full-width paging inside RemoteViews limits.** The swipe widget uses the platform `StackView`. It measures cards with `AT_MOST` and renders back cards offset to one side. On Android 12+ the provider enlarges the stack to `widget / 0.9`, anchors it bottom-start and clips the back cards.
 - **Layout fitting.** Title size comes from width tiers; the number of title lines (2/3/5 via separate layouts) is computed from the widget height after reserving space for dots or the counter. Row and Rail each have their own set.
 - **Honest position indicator.** The dot meter never shows a position the widget isn't at: 1:1 up to 7 papers, proportional above, with a numeric counter and a screen-reader description ("Paper 3 of 12").
 - **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ also changed how a `PendingIntent` creator lends launch rights. Widget taps go to a tiny translucent hand-off activity (allowed as a launcher/widget launch) that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege. A "Test: open newest paper" button in the app fires the same Aftergleam intent from the foreground, so a broken hand-off can be told apart from a launcher problem.
@@ -42,11 +44,15 @@ flowchart LR
     A[Aftergleam fork<br/>ContentProvider] -- signature permission --> C[PaperProviderClient]
     A -- data-changed broadcast --> R[ResearchWidgetsChangeReceiver]
     R --> P[PaperStripWidgetProvider]
+    R --> T[TapPaperWidgetProvider]
     C --> P
-    P -- sizes stack, sets adapter --> S[StackView]
+    C --> T
+    P -- adapter + template click --> S[StackView]
     C --> F[PaperStripRemoteViewsService<br/>RemoteViewsFactory]
     F -- one card per paper --> S
+    T -- plain RemoteViews + direct clicks --> W[Paper Strip (No Swipe)]
     S -- tap: PendingIntent + paper id --> O[OpenInAftergleamActivity<br/>hand-off]
+    W -- tap paper / advance edge --> O
     O --> A
 ```
 
