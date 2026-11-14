@@ -37,8 +37,8 @@ class WidgetConfigActivity : Activity() {
 
         root.addView(form.caption("LOOK", top = 20, bottom = 8))
         val styleGroup = form.optionGroup()
-        styleGroup.addView(form.option(ID_ROW, "Row — dots under the title"))
-        styleGroup.addView(form.option(ID_RAIL, "Rail — dots down the right edge, with 01/12 counter"))
+        styleGroup.addView(form.option(ID_ROW, "Bottom — dots under the title"))
+        styleGroup.addView(form.option(ID_RAIL, "Side — dots down the right edge"))
         styleGroup.check(if (WidgetPreferences.style(this, widgetId) == WidgetStyle.RAIL) ID_RAIL else ID_ROW)
         root.addView(styleGroup)
 

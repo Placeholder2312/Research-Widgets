@@ -10,6 +10,11 @@ object AftergleamContract {
     const val PAPER_OPEN_COMPONENT = "si.jakobkreft.aftergleam.integration.PaperOpenActivity"
     const val ACTION_OPEN_PAPER = "si.jakobkreft.aftergleam.action.OPEN_WIDGET_PAPER"
     const val EXTRA_PAPER_ID = "si.jakobkreft.aftergleam.extra.WIDGET_PAPER_ID"
+    /** Opens the fork's Library tab on one shelf; added together with the downloaded feed, so older forks ignore it. */
+    const val ACTION_OPEN_LIBRARY = "si.jakobkreft.aftergleam.action.OPEN_WIDGET_LIBRARY"
+    const val EXTRA_LIBRARY_SHELF = "si.jakobkreft.aftergleam.extra.WIDGET_LIBRARY_SHELF"
+    /** Library shelf names, as the fork spells them (its "Offline" chip is "downloaded"). */
+    const val SHELF_DOWNLOADED = "downloaded"
     const val ACTION_DATA_CHANGED = "si.jakobkreft.aftergleam.action.RESEARCH_WIDGETS_DATA_CHANGED"
 
     const val COLUMN_PAPER_ID = "paper_id"

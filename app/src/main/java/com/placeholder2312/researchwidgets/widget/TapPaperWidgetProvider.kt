@@ -72,10 +72,10 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
         private const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
         private const val LINE_HEIGHT_FACTOR = 1.3f
         private const val MAX_DOTS = 7
-        private const val RAIL_GAP_DP = 4
-        private const val RAIL_DOT_STEP_DP = 9 // 5dp dot + 4dp gap
+        private const val RAIL_GAP_DP = 5
+        private const val RAIL_DOT_STEP_DP = 9 // 4dp dot + 5dp gap
         private const val RAIL_CORNER_CLEARANCE_DP = 12 // keeps the rail off the rounded corners
-        private const val COUNTER_BLOCK_DP = 14 // 10sp mono line + 4dp margin
+        private const val COUNTER_BLOCK_DP = 16 // 10sp mono line + 6dp margin
         private const val NEXT_ZONE_MIN_DP = 32f
         private const val NEXT_ZONE_MAX_DP = 56f
 
@@ -199,7 +199,7 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
                 else -> baseTitleSize
             }
             // ROW: dots (and, past 7 papers, a counter) sit under the title and cost vertical space.
-            // RAIL: dots run down the right edge and cost horizontal space; a counter sits above the title.
+            // RAIL: dots run down the right edge and cost horizontal space; a counter sits below the title.
             val showDots = count > 1 && if (rail) height >= 40 else height >= 56
             val showCounter = count > 1 && if (rail) height >= 72 else (showDots && count > MAX_DOTS)
             val railDots = if (rail) {

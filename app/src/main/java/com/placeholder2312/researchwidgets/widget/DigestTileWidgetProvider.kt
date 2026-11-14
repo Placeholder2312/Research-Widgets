@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
+import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.DigestMode
 import com.placeholder2312.researchwidgets.data.FeedMode
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
@@ -57,6 +58,8 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_digest_tile)
 
             val description: String
+            // Only a fork new enough to serve the downloaded feed also understands the Library shortcut.
+            var opensOfflineShelf = false
             if (!today.connected) {
                 val label = when (today.state) {
                     ProviderState.NOT_INSTALLED -> "INSTALL AFTERGLEAM FORK"
@@ -70,7 +73,8 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
                 if (downloaded.connected) {
                     val count = downloaded.papers.size
                     show(views, "OFFLINE", "%02d".format(count), if (count == 1) "PDF ON DEVICE" else "PDFS ON DEVICE", "TODAY %02d".format(today.papers.size))
-                    description = "$count PDFs downloaded on this device. Open Aftergleam."
+                    description = "$count PDFs downloaded on this device. Open the offline library."
+                    opensOfflineShelf = true
                 } else {
                     // An Aftergleam build from before the downloaded feed existed rejects the request.
                     show(views, "OFFLINE", "--", "UPDATE AFTERGLEAM FORK", "TODAY %02d".format(today.papers.size))
@@ -84,9 +88,12 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
                 description = "$count papers in today's digest, $savedCount saved. Open Aftergleam."
             }
 
-            val tap = PendingIntents.activity(
-                context, REQUEST_BASE + id, Intent(context, OpenInAftergleamActivity::class.java)
-            )
+            val handOff = Intent(context, OpenInAftergleamActivity::class.java)
+            // Downloaded mode opens the Library on its Offline chip; Latest mode just opens Aftergleam.
+            if (opensOfflineShelf) {
+                handOff.putExtra(AftergleamContract.EXTRA_LIBRARY_SHELF, AftergleamContract.SHELF_DOWNLOADED)
+            }
+            val tap = PendingIntents.activity(context, REQUEST_BASE + id, handOff)
             views.setOnClickPendingIntent(R.id.digest_tile, tap)
             views.setContentDescription(R.id.digest_tile, description)
             manager.updateAppWidget(id, views)

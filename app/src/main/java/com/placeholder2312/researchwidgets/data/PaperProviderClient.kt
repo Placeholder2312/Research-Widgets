@@ -18,7 +18,7 @@ enum class FeedMode(val key: String, val label: String) {
     }
 }
 
-/** Look of one Paper Strip widget: dots under the title (ROW) or a vertical dot rail on the swipe axis (RAIL). */
+/** Look of one Paper Strip widget, shown as "Bottom" (ROW: dots under the title) or "Side" (RAIL: a vertical dot rail on the right edge). The stored keys stay "row" and "rail". */
 enum class WidgetStyle(val key: String) {
     ROW("row"),
     RAIL("rail");

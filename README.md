@@ -26,12 +26,12 @@ Nothing-style Android home-screen widgets for your research-paper feed. They are
 | **Research Paper Strip** | about 5×1 | One title fills the widget. Swipe up or down to move through papers; tap the current title to open it. |
 | **Paper Strip (No Swipe)** | about 5×1 | A separate, plain widget. Tap the paper to open it; tap the right edge, the dots or the counter for the next paper. No gestures. |
 | **Aftergleam tile** | about 2×2 | A static launcher tile that opens Aftergleam. |
-| **Digest tile** | about 2×2 | Inverted tile with one big number. **Latest** counts today's digest (saved count underneath); **Downloaded** counts PDFs kept on the device (today's count underneath). Long-press to reconfigure. |
+| **Digest tile** | about 2×2 | Inverted tile with one big number. **Latest** counts today's digest (saved count underneath); **Downloaded** counts PDFs kept on the device (today's count underneath). Long-press to reconfigure. In **Downloaded** mode, tapping it opens Aftergleam's Library on the **Offline** chip. |
 
-Both strips can show the **Recommended** digest or your **Saved** papers, chosen per widget, in a **Row** or **Rail** look.
+Both strips can show the **Recommended** digest or your **Saved** papers, chosen per widget, in a **Bottom** or **Side** look.
 
-- **Row**: position dots under the title.
-- **Rail**: a vertical dot rail on the right edge, plus a `03/12` counter.
+- **Bottom**: position dots under the title.
+- **Side**: a slim vertical dot rail on the right edge, with a `03/12` counter under the title.
 
 The current paper is the red dot. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first dot = first paper, last dot = last paper) and the counter gives the exact position.
 
@@ -100,7 +100,7 @@ Design notes:
 - **No network, no polling.** Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. Provider reads are cached for a few seconds so a widget and its adapter share one query.
 - **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ changed how a `PendingIntent` creator lends launch rights. Taps therefore go to a tiny translucent hand-off activity that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege.
 - **Full-width cards in `StackView`.** `StackView` measures cards with `AT_MOST` and parks back cards in the other 10% of its size. On Android 12+ the provider enlarges the stack to `widget / 0.9`, anchors it bottom-start, clips the back cards and sizes every card explicitly.
-- **Layout fitting.** Title size comes from width tiers; the number of title lines (2, 3 or 5, via separate layouts) comes from the widget height after reserving space for dots or the counter. Row and Rail each have their own layouts.
+- **Layout fitting.** Title size comes from width tiers; the number of title lines (2, 3 or 5, via separate layouts) comes from the widget height after reserving space for dots or the counter. Bottom and Side each have their own layouts.
 - **Honest position indicator.** The dots never show a position the widget isn't at, and the screen-reader description says "Paper 3 of 12".
 - **Dependency-free.** Plain Android SDK, no third-party runtime libraries.
 

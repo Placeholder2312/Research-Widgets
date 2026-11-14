@@ -11,7 +11,8 @@ import com.placeholder2312.researchwidgets.data.AftergleamLinks
  * window is actually on screen it opens Aftergleam, exactly like the in-app test button does. Starting the other
  * app from onCreate, before this window is visible, is what Android may block without any error.
  *
- * With a paper id it opens that paper; without one it just opens Aftergleam.
+ * With a paper id it opens that paper; with a library shelf it opens the Library on that shelf; with neither it
+ * just opens Aftergleam.
  */
 class OpenInAftergleamActivity : Activity() {
     private var handled = false
@@ -22,7 +23,12 @@ class OpenInAftergleamActivity : Activity() {
         handled = true
 
         val paperId = intent.getStringExtra(AftergleamContract.EXTRA_PAPER_ID)
-        val target = if (paperId.isNullOrBlank()) AftergleamLinks.launchApp() else AftergleamLinks.openPaper(paperId)
+        val shelf = intent.getStringExtra(AftergleamContract.EXTRA_LIBRARY_SHELF)
+        val target = when {
+            !paperId.isNullOrBlank() -> AftergleamLinks.openPaper(paperId)
+            !shelf.isNullOrBlank() -> AftergleamLinks.openLibrary(shelf)
+            else -> AftergleamLinks.launchApp()
+        }
         try {
             startActivity(target)
         } catch (e: SecurityException) {

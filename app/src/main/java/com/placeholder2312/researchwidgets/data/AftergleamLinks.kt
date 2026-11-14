@@ -17,6 +17,13 @@ object AftergleamLinks {
     fun openPaper(paperId: String): Intent =
         openPaperTemplate().putExtra(AftergleamContract.EXTRA_PAPER_ID, paperId)
 
+    /** Opens Aftergleam's Library tab with [shelf] selected, e.g. [AftergleamContract.SHELF_DOWNLOADED] for the Offline chip. */
+    fun openLibrary(shelf: String): Intent =
+        Intent(AftergleamContract.ACTION_OPEN_LIBRARY)
+            .setComponent(ComponentName(AftergleamContract.PACKAGE, AftergleamContract.PAPER_OPEN_COMPONENT))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(AftergleamContract.EXTRA_LIBRARY_SHELF, shelf)
+
     /** Same intent the launcher uses to start Aftergleam from its icon. */
     fun launchApp(): Intent =
         Intent(Intent.ACTION_MAIN)

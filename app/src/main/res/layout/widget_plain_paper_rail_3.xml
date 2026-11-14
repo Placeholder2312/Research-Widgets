@@ -18,18 +18,6 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/paper_counter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:fontFamily="monospace"
-            android:importantForAccessibility="no"
-            android:letterSpacing="0.1"
-            android:textColor="@color/nothing_muted"
-            android:textSize="10sp"
-            android:visibility="gone" />
-
-        <TextView
             android:id="@+id/paper_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,6 +26,18 @@
             android:maxLines="3"
             android:textColor="@color/nothing_ink"
             android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/paper_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="monospace"
+            android:importantForAccessibility="no"
+            android:letterSpacing="0.1"
+            android:textColor="@color/nothing_muted"
+            android:textSize="10sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
@@ -47,13 +47,13 @@
         android:layout_gravity="end|center_vertical"
         android:orientation="vertical">
 
-        <ImageView android:id="@+id/dot_0" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_1" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_2" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_3" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_4" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_5" android:layout_width="5dp" android:layout_height="5dp" android:layout_marginBottom="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:id="@+id/dot_6" android:layout_width="5dp" android:layout_height="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_0" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_1" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_2" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_3" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_4" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_5" android:layout_width="4dp" android:layout_height="4dp" android:layout_marginBottom="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:id="@+id/dot_6" android:layout_width="4dp" android:layout_height="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
     </LinearLayout>
 
     <FrameLayout

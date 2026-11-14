@@ -47,6 +47,18 @@ class AftergleamContractTest {
     }
 
     @Test
+    fun libraryIntentOpensTheOfflineShelfThroughTheProtectedActivity() {
+        val intent = AftergleamLinks.openLibrary(AftergleamContract.SHELF_DOWNLOADED)
+        assertEquals("si.jakobkreft.aftergleam.action.OPEN_WIDGET_LIBRARY", intent.action)
+        assertEquals(
+            ComponentName("si.jakobkreft.aftergleam", "si.jakobkreft.aftergleam.integration.PaperOpenActivity"),
+            intent.component
+        )
+        assertEquals("downloaded", intent.getStringExtra("si.jakobkreft.aftergleam.extra.WIDGET_LIBRARY_SHELF"))
+        assertTrue((intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0)
+    }
+
+    @Test
     fun launchIntentTargetsForkLauncherActivity() {
         val intent = AftergleamLinks.launchApp()
         assertEquals(Intent.ACTION_MAIN, intent.action)
