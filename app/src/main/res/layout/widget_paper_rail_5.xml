@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  StackView measures each card with AT_MOST; the service sizes the card explicitly on Android 12+, and the
+  oversized minWidth/minHeight below is only the pre-Android-12 fallback (clamped to the offered space).
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/paper_card"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nothing_card_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:minWidth="4000dp"
+    android:minHeight="4000dp"
+    android:paddingStart="16dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="18dp"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/paper_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+            android:fontFamily="monospace"
+            android:importantForAccessibility="no"
+            android:letterSpacing="0.1"
+            android:textColor="@color/nothing_muted"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/paper_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="5"
+            android:textColor="@color/nothing_ink"
+            android:textSize="22sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dot_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center_vertical"
+        android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/dot_0"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_1"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_2"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_3"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_4"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_5"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginBottom="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+            <ImageView
+                android:id="@+id/dot_6"
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/nothing_dot_off" />
+
+    </LinearLayout>
+</FrameLayout>

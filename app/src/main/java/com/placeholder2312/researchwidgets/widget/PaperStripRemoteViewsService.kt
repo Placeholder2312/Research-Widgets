@@ -11,6 +11,7 @@ import com.placeholder2312.researchwidgets.R
 import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
+import com.placeholder2312.researchwidgets.data.WidgetStyle
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
@@ -25,6 +26,9 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
 
     private inner class PaperFactory(private val widgetId: Int) : RemoteViewsFactory {
         private var papers = emptyList<com.placeholder2312.researchwidgets.data.WidgetPaper>()
+        private var width = 0
+        private var height = 0
+        private var style = WidgetStyle.ROW
 
         override fun onCreate() {
             reload()
@@ -35,25 +39,25 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
         }
 
         private fun reload() {
-            papers = if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-                emptyList()
-            } else {
-                PaperProviderClient.read(
-                    this@PaperStripRemoteViewsService,
-                    WidgetPreferences.mode(this@PaperStripRemoteViewsService, widgetId)
-                ).papers
+            if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
+                papers = emptyList()
+                return
             }
+            val context = this@PaperStripRemoteViewsService
+            style = WidgetPreferences.style(context, widgetId)
+            papers = PaperProviderClient.recent(context, WidgetPreferences.mode(context, widgetId)).papers
+            // Read the size once per reload instead of once per card.
+            val size = PaperStripWidgetProvider.sizeDp(context, AppWidgetManager.getInstance(context).getAppWidgetOptions(widgetId))
+            width = size.first
+            height = size.second
         }
 
         override fun getCount() = papers.size
 
         override fun getViewAt(position: Int): RemoteViews? {
             val paper = papers.getOrNull(position) ?: return null
-            val options = AppWidgetManager.getInstance(this@PaperStripRemoteViewsService)
-                .getAppWidgetOptions(widgetId)
-            val (width, height) = PaperStripWidgetProvider.sizeDp(this@PaperStripRemoteViewsService, options)
             val count = papers.size
-            val showDots = count > 1 && height >= 56
+            val rail = style == WidgetStyle.RAIL
 
             val horizontalPaddingDp = when {
                 width < 120 -> 8
@@ -80,12 +84,18 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 height >= 110 -> baseTitleSize + 2f
                 else -> baseTitleSize
             }
-            val dotsBlockDp = if (showDots) DOT_BLOCK_DP else 0
-            val fittingLines = ((height - 2 * verticalPaddingDp - dotsBlockDp) / (titleSize * LINE_HEIGHT_FACTOR)).toInt()
+            // ROW: dots (and, past 7 papers, a counter) sit under the title and cost vertical space.
+            // RAIL: dots run down the right edge and cost horizontal space; a counter sits above the title.
+            val showDots = count > 1 && if (rail) height >= 40 else height >= 56
+            val showCounter = count > 1 && if (rail) height >= 72 else (showDots && count > MAX_DOTS)
+            val railDots = if (rail) ((height - 2 * verticalPaddingDp + 5) / RAIL_DOT_STEP_DP).coerceIn(0, MAX_DOTS) else MAX_DOTS
+            val dotsBlockDp = if (!rail && showDots) DOT_BLOCK_DP else 0
+            val counterBlockDp = if (rail && showCounter) COUNTER_BLOCK_DP else 0
+            val fittingLines = ((height - 2 * verticalPaddingDp - dotsBlockDp - counterBlockDp) / (titleSize * LINE_HEIGHT_FACTOR)).toInt()
             val layoutId = when {
-                fittingLines >= 5 -> R.layout.widget_paper_card_5
-                fittingLines >= 3 -> R.layout.widget_paper_card_3
-                else -> R.layout.widget_paper_card
+                fittingLines >= 5 -> if (rail) R.layout.widget_paper_rail_5 else R.layout.widget_paper_card_5
+                fittingLines >= 3 -> if (rail) R.layout.widget_paper_rail_3 else R.layout.widget_paper_card_3
+                else -> if (rail) R.layout.widget_paper_rail else R.layout.widget_paper_card
             }
 
             val views = RemoteViews(packageName, layoutId)
@@ -119,8 +129,12 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
                 verticalPaddingPx
             )
 
-            views.setViewVisibility(R.id.dot_row, if (showDots) View.VISIBLE else View.GONE)
-            if (showDots) bindDots(views, position, count)
+            val dotCount = if (rail) minOf(count, railDots) else minOf(count, MAX_DOTS)
+            val dotsVisible = showDots && dotCount >= 2
+            views.setViewVisibility(R.id.dot_row, if (dotsVisible) View.VISIBLE else View.GONE)
+            if (dotsVisible) bindDots(views, position, count, dotCount)
+            views.setViewVisibility(R.id.paper_counter, if (showCounter) View.VISIBLE else View.GONE)
+            if (showCounter) views.setTextViewText(R.id.paper_counter, "%02d/%02d".format(position + 1, count))
 
             val description = listOf(
                 paper.title,
@@ -137,13 +151,12 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
         }
 
         /**
-         * Position meter. Up to [MAX_DOTS] papers get one dot each; with more papers the fixed row of dots
-         * is a proportional meter (first dot = first paper, last dot = last paper), so the red dot never
+         * Position meter. Up to [MAX_DOTS] papers get one dot each; with more papers the fixed set of dots
+         * (a row, or a vertical rail) is a proportional meter (first dot = first paper, last dot = last paper), so the red dot never
          * claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
          */
-        private fun bindDots(views: RemoteViews, position: Int, count: Int) {
-            val visible = minOf(count, MAX_DOTS)
-            val active = if (count <= MAX_DOTS) {
+        private fun bindDots(views: RemoteViews, position: Int, count: Int, visible: Int) {
+            val active = if (count <= visible) {
                 position
             } else {
                 Math.round(position * (visible - 1).toFloat() / (count - 1))
@@ -162,7 +175,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
         }
 
         override fun getLoadingView(): RemoteViews? = null
-        override fun getViewTypeCount() = 3
+        override fun getViewTypeCount() = 6
         override fun getItemId(position: Int) = papers.getOrNull(position)?.id?.hashCode()?.toLong() ?: position.toLong()
         override fun hasStableIds() = true
 
@@ -175,6 +188,8 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
         const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
         const val LINE_HEIGHT_FACTOR = 1.3f
         const val MAX_DOTS = 7
+        const val RAIL_DOT_STEP_DP = 11 // 6dp dot + 5dp gap
+        const val COUNTER_BLOCK_DP = 14 // 10sp mono line + 4dp margin
         val DOT_IDS = intArrayOf(
             R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6
         )

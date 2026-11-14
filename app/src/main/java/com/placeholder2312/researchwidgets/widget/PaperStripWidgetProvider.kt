@@ -38,10 +38,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
         for (index in 0 until minOf(oldIds.size, newIds.size)) {
             val oldId = oldIds[index]
             val newId = newIds[index]
-            val mode = WidgetPreferences.mode(context, oldId)
-            val paperIndex = WidgetPreferences.index(context, oldId)
-            WidgetPreferences.setMode(context, newId, mode)
-            WidgetPreferences.setIndex(context, newId, paperIndex)
+            WidgetPreferences.setMode(context, newId, WidgetPreferences.mode(context, oldId))
+            WidgetPreferences.setStyle(context, newId, WidgetPreferences.style(context, oldId))
             WidgetPreferences.clear(context, oldId)
         }
         refreshAll(context)

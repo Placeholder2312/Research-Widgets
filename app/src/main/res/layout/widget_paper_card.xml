@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  StackView measures each card with AT_MOST, so a match_parent card would shrink to its text.
-  The oversized minWidth/minHeight make the card fill the full space StackView offers (it is clamped).
+  StackView measures each card with AT_MOST; the service sizes the card explicitly on Android 12+, and the
+  oversized minWidth/minHeight below is only the pre-Android-12 fallback (clamped to the offered space).
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/paper_card"
@@ -13,9 +13,9 @@
     android:minWidth="4000dp"
     android:minHeight="4000dp"
     android:paddingStart="16dp"
-    android:paddingTop="4dp"
+    android:paddingTop="6dp"
     android:paddingEnd="16dp"
-    android:paddingBottom="4dp">
+    android:paddingBottom="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageView
@@ -95,6 +96,17 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/nothing_dot_off" />
 
+            <TextView
+                android:id="@+id/paper_counter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="monospace"
+                android:importantForAccessibility="no"
+                android:letterSpacing="0.1"
+                android:textColor="@color/nothing_muted"
+                android:textSize="10sp"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

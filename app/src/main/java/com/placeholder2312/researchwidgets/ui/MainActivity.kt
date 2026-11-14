@@ -3,12 +3,16 @@ package com.placeholder2312.researchwidgets.ui
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.placeholder2312.researchwidgets.R
+import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.FeedMode
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.widget.AftergleamTileWidgetProvider
@@ -27,6 +31,7 @@ class MainActivity : Activity() {
         }
         findViewById<Button>(R.id.add_strip).setOnClickListener { pin(PaperStripWidgetProvider::class.java) }
         findViewById<Button>(R.id.add_tile).setOnClickListener { pin(AftergleamTileWidgetProvider::class.java) }
+        findViewById<TextView>(R.id.app_version).text = versionLabel()
         refreshStatus()
     }
 
@@ -34,6 +39,27 @@ class MainActivity : Activity() {
         super.onResume()
         refreshStatus()
     }
+
+    /** "V1.5.1 · BUILD 10" for this app, plus the connected Aftergleam version when it can be read. */
+    private fun versionLabel(): String {
+        val own = packageInfo(packageName)
+        val label = "V${own?.versionName ?: "?"} · BUILD ${own?.let(::buildNumber) ?: "?"}"
+        val aftergleam = packageInfo(AftergleamContract.PACKAGE)?.versionName
+        return if (aftergleam == null) label else "$label\nAFTERGLEAM V$aftergleam"
+    }
+
+    private fun packageInfo(pkg: String): PackageInfo? = try {
+        if (Build.VERSION.SDK_INT >= 33) {
+            packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0L))
+        } else {
+            @Suppress("DEPRECATION") packageManager.getPackageInfo(pkg, 0)
+        }
+    } catch (e: PackageManager.NameNotFoundException) {
+        null
+    }
+
+    private fun buildNumber(info: PackageInfo): Long =
+        if (Build.VERSION.SDK_INT >= 28) info.longVersionCode else @Suppress("DEPRECATION") info.versionCode.toLong()
 
     private fun refreshStatus() {
         findViewById<TextView>(R.id.connection_status).text =

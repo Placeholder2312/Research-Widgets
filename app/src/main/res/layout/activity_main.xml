@@ -12,17 +12,35 @@
         android:padding="24dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-            <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="0dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="7dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+                <ImageView android:layout_width="8dp" android:layout_height="8dp" android:layout_marginEnd="0dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/app_version"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:gravity="end"
+                android:letterSpacing="0.1"
+                android:textColor="@color/nothing_muted"
+                android:textSize="10sp" />
         </LinearLayout>
 
         <TextView
