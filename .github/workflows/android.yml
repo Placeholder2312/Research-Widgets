@@ -1,5 +1,8 @@
 name: Android build and tests
 on:
+  push:
+    branches:
+      - fix/stack-taps-patch
   workflow_dispatch:
 permissions:
   contents: write
