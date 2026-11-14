@@ -20,6 +20,7 @@ import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.widget.AftergleamTileWidgetProvider
 import com.placeholder2312.researchwidgets.widget.DigestTileWidgetProvider
 import com.placeholder2312.researchwidgets.widget.PaperStripWidgetProvider
+import com.placeholder2312.researchwidgets.widget.TapPaperWidgetProvider
 
 /** Home screen of the app: connection status plus add/refresh controls for both widgets. */
 class MainActivity : Activity() {
@@ -31,10 +32,12 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.open_paper).setOnClickListener { openNewestPaper() }
         findViewById<Button>(R.id.refresh_widgets).setOnClickListener {
             PaperStripWidgetProvider.refreshAll(this)
+            TapPaperWidgetProvider.refreshAll(this)
             DigestTileWidgetProvider.refreshAll(this)
             refreshStatus()
         }
         findViewById<Button>(R.id.add_strip).setOnClickListener { pin(PaperStripWidgetProvider::class.java) }
+        findViewById<Button>(R.id.add_plain_strip).setOnClickListener { pin(TapPaperWidgetProvider::class.java) }
         findViewById<Button>(R.id.add_tile).setOnClickListener { pin(AftergleamTileWidgetProvider::class.java) }
         findViewById<Button>(R.id.add_digest).setOnClickListener { pin(DigestTileWidgetProvider::class.java) }
         findViewById<TextView>(R.id.app_version).text = versionLabel()
@@ -80,6 +83,7 @@ class MainActivity : Activity() {
             }
         }.start()
         bindWidgetRow(PaperStripWidgetProvider::class.java, R.id.strip_count, R.id.strip_dot)
+        bindWidgetRow(TapPaperWidgetProvider::class.java, R.id.plain_strip_count, R.id.plain_strip_dot)
         bindWidgetRow(AftergleamTileWidgetProvider::class.java, R.id.tile_count, R.id.tile_dot)
         bindWidgetRow(DigestTileWidgetProvider::class.java, R.id.digest_tile_count, R.id.digest_dot)
     }

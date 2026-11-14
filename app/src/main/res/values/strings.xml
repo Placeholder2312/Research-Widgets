@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="app_name">Research Widgets</string><string name="widget_config_title">Research Paper Strip setup</string><string name="widget_label_strip">Paper Strip</string><string name="widget_label_tile">Aftergleam Tile</string><string name="widget_label_digest">Digest Tile</string><string name="digest_config_title">Digest Tile setup</string></resources>
+<string name="app_name">Research Widgets</string><string name="widget_config_title">Research Paper Strip setup</string><string name="widget_label_strip">Paper Strip</string><string name="widget_label_tile">Aftergleam Tile</string><string name="widget_label_digest">Digest Tile</string><string name="digest_config_title">Digest Tile setup</string><string name="widget_label_plain_strip">Paper Strip (No Swipe)</string><string name="plain_widget_config_title">Paper Strip (No Swipe) setup</string>
+</resources>
