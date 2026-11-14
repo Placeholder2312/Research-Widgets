@@ -1,6 +1,6 @@
 # Research Widgets
 
-Nothing-style Android home-screen widgets that put today's research papers one swipe away — a companion to a customized [Aftergleam](https://github.com/jakobkreft) fork.
+Nothing-style Android home-screen widgets that put today's research papers one swipe away — a companion to a customized fork of the Aftergleam research-paper app.
 
 ![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-100%25-7F52FF?logo=kotlin&logoColor=white)
@@ -32,7 +32,7 @@ Design follows the Nothing "Classic" look: light/dark from the system, monospace
 - **Honest position indicator.** The dot meter never shows a position the widget isn't at: 1:1 up to 7 papers, proportional above, with a numeric counter and a screen-reader description ("Paper 3 of 12").
 - **Reliable taps.** Launchers sending a mutable `PendingIntent` straight to another app fail silently. Taps go to an in-app trampoline activity that forwards to Aftergleam and shows a message on failure (for example a signing-key mismatch).
 - **Signature-protected IPC.** Papers are read from a read-only `ContentProvider` guarded by a signature permission; no network permission and no polling. Aftergleam pushes a protected change broadcast and the widgets re-query.
-- **Small and dependency-free.** Plain Android SDK, no third-party runtime libraries, about 700 lines of Kotlin. Provider reads are cached for a few seconds so the widget and its list adapter share one query.
+- **Small and dependency-free.** Plain Android SDK, no third-party runtime libraries, roughly a thousand lines of Kotlin. Provider reads are cached for a few seconds so the widget and its list adapter share one query.
 
 ## Architecture
 
