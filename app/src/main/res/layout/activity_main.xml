@@ -70,7 +70,7 @@
             android:fontFamily="monospace"
             android:importantForAccessibility="no"
             android:letterSpacing="0.14"
-            android:text="CONNECTION"
+            android:text="01 — CONNECTION"
             android:textColor="@color/nothing_muted"
             android:textSize="11sp" />
 
@@ -81,14 +81,30 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <TextView
-                android:id="@+id/connection_status"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:text="Checking Aftergleam…"
-                android:textColor="@color/nothing_ink"
-                android:textSize="14sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/connection_dot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/nothing_dot_off" />
+
+                <TextView
+                    android:id="@+id/connection_status"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:fontFamily="monospace"
+                    android:text="Checking Aftergleam…"
+                    android:textColor="@color/nothing_ink"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <Button
                 android:id="@+id/check_connection"
@@ -112,7 +128,7 @@
             android:fontFamily="monospace"
             android:importantForAccessibility="no"
             android:letterSpacing="0.14"
-            android:text="WIDGET CONTROL"
+            android:text="02 — WIDGETS"
             android:textColor="@color/nothing_muted"
             android:textSize="11sp" />
 
@@ -247,6 +263,69 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/nothing_outline" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
+
+                <ImageView
+                    android:id="@+id/digest_dot"
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/nothing_dot_off" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
+                        android:text="Digest Tile"
+                        android:textColor="@color/nothing_ink"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/digest_tile_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.08"
+                        android:text="…"
+                        android:textColor="@color/nothing_muted"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/add_digest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:background="@drawable/nothing_button_outline"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.1"
+                    android:minWidth="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:stateListAnimator="@null"
+                    android:text="Add"
+                    android:textColor="@color/nothing_ink"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
             <Button
                 android:id="@+id/refresh_widgets"
                 android:layout_width="match_parent"
@@ -267,7 +346,7 @@
             android:layout_marginTop="28dp"
             android:fontFamily="monospace"
             android:letterSpacing="0.04"
-            android:text="NO ACCOUNT · NO SERVER · NO ANALYTICS · NO NETWORK. PAPER METADATA STAYS ON THIS DEVICE."
+            android:text="NO ACCOUNT · NO SERVER\nNO ANALYTICS · NO NETWORK\nPAPER METADATA STAYS ON THIS DEVICE"
             android:textColor="@color/nothing_muted"
             android:textSize="10sp" />
     </LinearLayout>

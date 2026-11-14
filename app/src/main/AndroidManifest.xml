@@ -36,7 +36,8 @@
         </activity>
         <receiver
             android:name=".widget.PaperStripWidgetProvider"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_label_strip">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -46,13 +47,25 @@
         </receiver>
         <receiver
             android:name=".widget.AftergleamTileWidgetProvider"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_label_tile">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/aftergleam_tile_info" />
+        </receiver>
+        <receiver
+            android:name=".widget.DigestTileWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label_digest">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/digest_tile_info" />
         </receiver>
         <receiver
             android:name=".widget.ResearchWidgetsChangeReceiver"

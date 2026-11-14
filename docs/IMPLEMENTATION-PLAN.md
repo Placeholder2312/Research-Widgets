@@ -21,6 +21,7 @@
 - Keep per-instance Recommended/Saved feed and Row/Rail style preferences, empty/disconnected states, title typography, red position dots and dark/light colours. Swiping replaces previous/next buttons.
 - Row style: dots under the title; Rail style: vertical dot rail on the swipe axis plus an NN/NN counter. A counter also appears in Row once there are more than 7 papers.
 - Decorative Aftergleam tile uses the supplied brand mark and opens the customized fork.
+- Digest tile (2×2, inverted card) shows today's digest and saved counts from the provider, refreshed by the data-changed broadcast and on boot/update.
 - Companion receiver handles protected data-change notifications and refreshes widgets; boot/update lifecycle handling restores widget state.
 
 ### Phase 3 — shared signing and cross-app integration (shared key configured)

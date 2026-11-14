@@ -16,6 +16,7 @@ import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.FeedMode
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.widget.AftergleamTileWidgetProvider
+import com.placeholder2312.researchwidgets.widget.DigestTileWidgetProvider
 import com.placeholder2312.researchwidgets.widget.PaperStripWidgetProvider
 
 /** Home screen of the app: connection status plus add/refresh controls for both widgets. */
@@ -27,10 +28,12 @@ class MainActivity : Activity() {
         findViewById<Button>(R.id.check_connection).setOnClickListener { refreshStatus() }
         findViewById<Button>(R.id.refresh_widgets).setOnClickListener {
             PaperStripWidgetProvider.refreshAll(this)
+            DigestTileWidgetProvider.refreshAll(this)
             refreshStatus()
         }
         findViewById<Button>(R.id.add_strip).setOnClickListener { pin(PaperStripWidgetProvider::class.java) }
         findViewById<Button>(R.id.add_tile).setOnClickListener { pin(AftergleamTileWidgetProvider::class.java) }
+        findViewById<Button>(R.id.add_digest).setOnClickListener { pin(DigestTileWidgetProvider::class.java) }
         findViewById<TextView>(R.id.app_version).text = versionLabel()
     }
 
@@ -64,13 +67,18 @@ class MainActivity : Activity() {
     /** The provider query runs off the main thread so a slow Aftergleam can't freeze the screen. */
     private fun refreshStatus() {
         Thread {
-            val message = PaperProviderClient.read(this, FeedMode.RECOMMENDED).message
+            val result = PaperProviderClient.read(this, FeedMode.RECOMMENDED)
             runOnUiThread {
-                if (!isDestroyed) findViewById<TextView>(R.id.connection_status).text = message
+                if (isDestroyed) return@runOnUiThread
+                findViewById<TextView>(R.id.connection_status).text = result.message
+                findViewById<ImageView>(R.id.connection_dot).setImageResource(
+                    if (result.connected) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
+                )
             }
         }.start()
         bindWidgetRow(PaperStripWidgetProvider::class.java, R.id.strip_count, R.id.strip_dot)
         bindWidgetRow(AftergleamTileWidgetProvider::class.java, R.id.tile_count, R.id.tile_dot)
+        bindWidgetRow(DigestTileWidgetProvider::class.java, R.id.digest_tile_count, R.id.digest_dot)
     }
 
     private fun bindWidgetRow(provider: Class<*>, countId: Int, dotId: Int) {

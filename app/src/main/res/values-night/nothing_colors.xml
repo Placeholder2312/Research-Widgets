@@ -7,4 +7,7 @@
     <color name="nothing_dot_idle">#598A8A8A</color>
     <color name="nothing_page">#000000</color>
     <color name="nothing_outline">#33FFFFFF</color>
+    <color name="nothing_inverse_card">#F2F2F2</color>
+    <color name="nothing_inverse_ink">#000000</color>
+    <color name="nothing_inverse_muted">#6B6B6B</color>
 </resources>

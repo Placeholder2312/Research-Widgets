@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/digest_tile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nothing_card_inverse_bg"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:fontFamily="monospace"
+        android:importantForAccessibility="no"
+        android:letterSpacing="0.14"
+        android:text="TODAY"
+        android:textColor="@color/nothing_inverse_muted"
+        android:textSize="10sp" />
+
+    <ImageView
+        android:layout_width="7dp"
+        android:layout_height="7dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="2dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/nothing_dot_red" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/digest_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="--"
+            android:textColor="@color/nothing_inverse_ink"
+            android:textSize="56sp" />
+
+        <TextView
+            android:id="@+id/digest_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="monospace"
+            android:importantForAccessibility="no"
+            android:letterSpacing="0.1"
+            android:maxLines="2"
+            android:text="PAPERS"
+            android:textColor="@color/nothing_inverse_muted"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/digest_saved"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:fontFamily="monospace"
+        android:importantForAccessibility="no"
+        android:letterSpacing="0.14"
+        android:textColor="@color/nothing_inverse_ink"
+        android:textSize="10sp" />
+</FrameLayout>

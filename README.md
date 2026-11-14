@@ -13,8 +13,9 @@ Nothing-style Android home-screen widgets that put today's research papers one s
 | --- | --- |
 | **Research Paper Strip** (about 5×1) | One paper title fills the widget. Swipe up/down to move through the feed, tap to open the paper in Aftergleam. Choose the **Recommended** digest or **Saved** papers per widget, and a **Row** or **Rail** look. |
 | **Aftergleam tile** (about 2×2) | A static launcher tile that opens Aftergleam. |
+| **Digest tile** (about 2×2) | Inverted black/white tile with the number of papers in today's digest and how many are saved. Updates when Aftergleam's data changes; tap opens Aftergleam. |
 
-The app itself is a small control panel: connection status, add/refresh buttons for each widget, and a version label.
+The app itself is a small control panel: connection status (red dot when connected), add buttons and placed-widget counts for each widget, a refresh button, and a version label.
 
 **Strip styles**
 

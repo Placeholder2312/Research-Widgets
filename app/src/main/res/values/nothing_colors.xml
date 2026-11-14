@@ -8,4 +8,8 @@
     <color name="nothing_dot_idle">#596B6B6B</color>
     <color name="nothing_page">#FFFFFF</color>
     <color name="nothing_outline">#1F000000</color>
+    <!-- Inverted card (Digest tile): black in light mode, near-white in dark mode. -->
+    <color name="nothing_inverse_card">#000000</color>
+    <color name="nothing_inverse_ink">#FFFFFF</color>
+    <color name="nothing_inverse_muted">#8A8A8A</color>
 </resources>
