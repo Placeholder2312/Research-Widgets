@@ -3,8 +3,6 @@ package com.placeholder2312.researchwidgets.data
 import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
-import com.placeholder2312.researchwidgets.data.AftergleamContract
-import com.placeholder2312.researchwidgets.data.AftergleamLinks
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -24,12 +22,16 @@ class AftergleamContractTest {
         assertEquals("si.jakobkreft.aftergleam.permission.READ_RESEARCH_WIDGETS", AftergleamContract.READ_PERMISSION)
         assertEquals(Uri.parse("content://si.jakobkreft.aftergleam.researchwidgets/v1/recommended"), AftergleamContract.RECOMMENDED_URI)
         assertEquals(Uri.parse("content://si.jakobkreft.aftergleam.researchwidgets/v1/saved"), AftergleamContract.SAVED_URI)
-        assertEquals(Uri.parse("content://si.jakobkreft.aftergleam.researchwidgets/v1/downloaded"), AftergleamContract.DOWNLOADED_URI)
         assertArrayEquals(
             arrayOf("paper_id", "title", "authors", "source", "published", "feed_position", "feed_type"),
             AftergleamContract.COLUMNS
         )
         assertEquals("si.jakobkreft.aftergleam.action.RESEARCH_WIDGETS_DATA_CHANGED", AftergleamContract.ACTION_DATA_CHANGED)
+    }
+
+    @Test
+    fun optionalDownloadedFeedUsesTheExtensionUri() {
+        assertEquals(Uri.parse("content://si.jakobkreft.aftergleam.researchwidgets/v1/downloaded"), AftergleamContract.DOWNLOADED_URI)
     }
 
     @Test
