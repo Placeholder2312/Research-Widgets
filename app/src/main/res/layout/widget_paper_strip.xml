@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Initial layout and empty/offline state of the strip; the paper cards are widget_paper_card*/rail*. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,23 +8,10 @@
     android:clipToOutline="true"
     android:outlineProvider="background">
 
-    <!--
-      Swipe up/down cycles papers. StackView gives its cards 90% of its own size and parks the
-      back cards in the other 10%; on Android 12+ the provider enlarges the stack so the front card
-      fills the widget and the back cards sit outside it (clipped). Front card sits bottom-start.
-    -->
-    <StackView
-        android:id="@+id/paper_stack"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|start"
-        android:clipToPadding="false" />
-
     <LinearLayout
         android:id="@+id/empty_state"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/nothing_card_bg"
         android:gravity="center"
         android:orientation="vertical">
 
