@@ -41,7 +41,7 @@ class AftergleamContractTest {
             intent.component
         )
         assertEquals("fixture-paper-id", intent.getStringExtra("si.jakobkreft.aftergleam.extra.WIDGET_PAPER_ID"))
-        assertTrue(intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+        assertTrue((intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK) != 0)
     }
 
     @Test
