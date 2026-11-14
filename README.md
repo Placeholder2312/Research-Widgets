@@ -98,3 +98,11 @@ Robolectric unit tests cover provider row mapping, graceful handling of a missin
 ## Status
 
 Builds and unit tests pass in CI. Swipe, tap and both styles still need confirmation on physical devices, since launcher hosts differ; see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for the phased plan and what is verified.
+
+## Aftergleam fork compatibility
+
+`Research-Widgets` is paired with [`Placeholder2312/Aftergleam-For-Widgets`](https://github.com/Placeholder2312/Aftergleam-For-Widgets), branch `main`. The IPC contract is versioned as v1 and is protected by the `si.jakobkreft.aftergleam.permission.READ_RESEARCH_WIDGETS` signature permission. The current fork exposes the Recommended and Saved feeds at `content://si.jakobkreft.aftergleam.researchwidgets/v1/recommended` and `/v1/saved`, with the seven columns declared in `AftergleamContract`. Paper taps target the fork's protected `si.jakobkreft.aftergleam.integration.PaperOpenActivity`; data changes arrive through `si.jakobkreft.aftergleam.action.RESEARCH_WIDGETS_DATA_CHANGED`.
+
+Both apps must be installed with the same signing certificate for provider reads, paper opening, and protected refresh broadcasts. Their GitHub Actions workflows require the same `RESEARCH_WIDGETS_*` signing secrets and validate the keystore before building. Contract regression tests in this repository pin the package, permission, URI, columns, and intent values to the fork's v1 API.
+
+The optional Downloaded feed (`/v1/downloaded`) is not yet part of the fork's current `main`; it is available only on the fork's `feature/downloaded-feed` branch. The Digest Tile labels that mode as requiring the newer fork build and displays an update message when an older provider rejects the request. Recommended, Saved, paper opening, and change notifications work independently of that optional feed.
