@@ -1,8 +1,5 @@
 name: Android build and tests
 on:
-  push:
-    branches:
-      - fix/stack-taps-patch
   workflow_dispatch:
 permissions:
   contents: write
@@ -63,7 +60,6 @@ jobs:
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
       - name: Publish APK to GitHub Releases
         uses: softprops/action-gh-release@v2
-        continue-on-error: true
         with:
           tag_name: research-widgets-v${{ env.VERSION_NAME }}-build-${{ github.run_number }}
           name: Research Widgets v${{ env.VERSION_NAME }} (build #${{ github.run_number }})
