@@ -10,10 +10,11 @@ import android.util.Log
 /** Which Aftergleam feed a widget shows. */
 enum class FeedMode(val key: String, val label: String) {
     RECOMMENDED("recommended", "Recommended"),
-    SAVED("saved", "Saved");
+    SAVED("saved", "Saved"),
+    DOWNLOADED("downloaded", "Downloaded");
 
     companion object {
-        fun from(value: String?) = if (value == SAVED.key) SAVED else RECOMMENDED
+        fun from(value: String?) = values().firstOrNull { it.key == value } ?: RECOMMENDED
     }
 }
 
@@ -36,6 +37,16 @@ data class WidgetPaper(
     val position: Int,
     val feedType: String
 )
+
+/** What the Digest tile counts: today's digest (LATEST) or PDFs kept on the device (DOWNLOADED). */
+enum class DigestMode(val key: String) {
+    LATEST("latest"),
+    DOWNLOADED("downloaded");
+
+    companion object {
+        fun from(value: String?) = if (value == DOWNLOADED.key) DOWNLOADED else LATEST
+    }
+}
 
 enum class ProviderState { CONNECTED, NOT_INSTALLED, PERMISSION_DENIED, UNAVAILABLE }
 
@@ -83,7 +94,11 @@ object PaperProviderClient {
             return FeedRead(ProviderState.NOT_INSTALLED, "Install the customized Aftergleam fork to connect.")
         }
 
-        val uri = if (mode == FeedMode.RECOMMENDED) AftergleamContract.RECOMMENDED_URI else AftergleamContract.SAVED_URI
+        val uri = when (mode) {
+            FeedMode.RECOMMENDED -> AftergleamContract.RECOMMENDED_URI
+            FeedMode.SAVED -> AftergleamContract.SAVED_URI
+            FeedMode.DOWNLOADED -> AftergleamContract.DOWNLOADED_URI
+        }
         return try {
             val cursor = context.contentResolver.query(uri, AftergleamContract.COLUMNS, null, null, null)
                 ?: return FeedRead(ProviderState.UNAVAILABLE, "Aftergleam did not return a feed.")
@@ -100,6 +115,7 @@ object PaperProviderClient {
     private fun connectedMessage(mode: FeedMode, empty: Boolean) = when {
         !empty -> "Connected to Aftergleam."
         mode == FeedMode.SAVED -> "No saved papers yet."
+        mode == FeedMode.DOWNLOADED -> "No downloaded papers yet."
         else -> "Today's digest is empty or has not been built yet."
     }
 

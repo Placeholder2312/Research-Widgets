@@ -27,4 +27,7 @@ object AftergleamContract {
 
     val RECOMMENDED_URI: Uri = Uri.parse("content://$AUTHORITY/v1/recommended")
     val SAVED_URI: Uri = Uri.parse("content://$AUTHORITY/v1/saved")
+
+    /** Added in a later fork build; older forks reject it, which the companion treats as "update the fork". */
+    val DOWNLOADED_URI: Uri = Uri.parse("content://$AUTHORITY/v1/downloaded")
 }

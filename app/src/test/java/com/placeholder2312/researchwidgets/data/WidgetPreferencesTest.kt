@@ -44,6 +44,16 @@ class WidgetPreferencesTest {
     }
 
     @Test
+    fun digestModeIsStoredPerWidgetInstance() {
+        assertEquals(DigestMode.LATEST, WidgetPreferences.digestMode(context, 71))
+        WidgetPreferences.setDigestMode(context, 71, DigestMode.DOWNLOADED)
+        assertEquals(DigestMode.DOWNLOADED, WidgetPreferences.digestMode(context, 71))
+        assertEquals(DigestMode.LATEST, WidgetPreferences.digestMode(context, 72))
+        WidgetPreferences.clear(context, 71)
+        assertEquals(DigestMode.LATEST, WidgetPreferences.digestMode(context, 71))
+    }
+
+    @Test
     fun restoredWidgetIdsKeepTheirOwnModeAndStyle() {
         WidgetPreferences.setMode(context, 51, FeedMode.SAVED)
         WidgetPreferences.setStyle(context, 51, WidgetStyle.RAIL)

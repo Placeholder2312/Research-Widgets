@@ -9,6 +9,7 @@ object WidgetPreferences {
     private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private fun modeKey(id: Int) = "mode_$id"
     private fun styleKey(id: Int) = "style_$id"
+    private fun digestKey(id: Int) = "digest_$id"
 
     fun mode(context: Context, id: Int) =
         FeedMode.from(prefs(context).getString(modeKey(id), FeedMode.RECOMMENDED.key))
@@ -23,7 +24,13 @@ object WidgetPreferences {
         prefs(context).edit().putString(styleKey(id), style.key).apply()
     }
 
+    fun digestMode(context: Context, id: Int) = DigestMode.from(prefs(context).getString(digestKey(id), null))
+
+    fun setDigestMode(context: Context, id: Int, mode: DigestMode) {
+        prefs(context).edit().putString(digestKey(id), mode.key).apply()
+    }
+
     fun clear(context: Context, id: Int) {
-        prefs(context).edit().remove(modeKey(id)).remove(styleKey(id)).apply()
+        prefs(context).edit().remove(modeKey(id)).remove(styleKey(id)).remove(digestKey(id)).apply()
     }
 }

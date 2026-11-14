@@ -13,7 +13,7 @@ Nothing-style Android home-screen widgets that put today's research papers one s
 | --- | --- |
 | **Research Paper Strip** (about 5×1) | One paper title fills the widget. Swipe up/down to move through the feed, tap to open the paper in Aftergleam. Choose the **Recommended** digest or **Saved** papers per widget, and a **Row** or **Rail** look. |
 | **Aftergleam tile** (about 2×2) | A static launcher tile that opens Aftergleam. |
-| **Digest tile** (about 2×2) | Inverted black/white tile with the number of papers in today's digest and how many are saved. Updates when Aftergleam's data changes; tap opens Aftergleam. |
+| **Digest tile** (about 2×2) | Inverted black/white tile with one big number. **Latest** counts today's digest (saved count underneath); **Downloaded** counts PDFs kept on the device (today's count underneath). Pick the mode per tile; long-press to reconfigure. Updates when Aftergleam's data changes; tap opens Aftergleam. |
 
 The app itself is a small control panel: connection status (red dot when connected), add buttons and placed-widget counts for each widget, a refresh button, and a version label.
 
@@ -31,7 +31,7 @@ Design follows the Nothing "Classic" look: light/dark from the system, monospace
 - **Full-width paging inside RemoteViews limits.** Widgets can't run arbitrary views, so swiping uses the platform `StackView`. It measures cards with `AT_MOST` (cards shrink to their text) and renders back cards offset to one side. The fix: on Android 12+ the provider enlarges the stack to `widget / 0.9` (StackView gives children 90% of its size), anchors it bottom-start so the back cards fall outside and are clipped, and sizes every card explicitly to the widget minus StackView's built-in frame padding.
 - **Layout fitting.** Title size comes from width tiers; the number of title lines (2/3/5 via separate layouts) is computed from the widget height after reserving space for dots or the counter. Row and Rail each have their own set.
 - **Honest position indicator.** The dot meter never shows a position the widget isn't at: 1:1 up to 7 papers, proportional above, with a numeric counter and a screen-reader description ("Paper 3 of 12").
-- **Reliable taps.** Android 15+ no longer lets a PendingIntent's creator lend background-launch rights unless it opts in, and a trampoline activity that starts another app's activity can be blocked silently. Widget taps therefore use a `PendingIntent` that targets Aftergleam's paper-open screen directly (explicit component, mutable template plus a per-card fill-in with the paper id) and opt in to the creator launch privilege. A "Test: open newest paper" button in the app uses the same intent, so a broken hand-off can be told apart from a launcher problem.
+- **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ also changed how a `PendingIntent` creator lends launch rights. Widget taps go to a tiny translucent hand-off activity (allowed as a launcher/widget launch) that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege. A "Test: open newest paper" button in the app fires the same Aftergleam intent from the foreground, so a broken hand-off can be told apart from a launcher problem.
 - **Signature-protected IPC.** Papers are read from a read-only `ContentProvider` guarded by a signature permission; no network permission and no polling. Aftergleam pushes a protected change broadcast and the widgets re-query.
 - **Small and dependency-free.** Plain Android SDK, no third-party runtime libraries, roughly a thousand lines of Kotlin. Provider reads are cached for a few seconds so the widget and its list adapter share one query.
 
@@ -46,19 +46,20 @@ flowchart LR
     P -- sizes stack, sets adapter --> S[StackView]
     C --> F[PaperStripRemoteViewsService<br/>RemoteViewsFactory]
     F -- one card per paper --> S
-    S -- tap: PendingIntent + paper id --> A
+    S -- tap: PendingIntent + paper id --> O[OpenInAftergleamActivity<br/>hand-off]
+    O --> A
 ```
 
 | Package | Role |
 | --- | --- |
 | `data/` | Provider contract, read-only client (never throws; returns a state and message), per-widget preferences |
-| `widget/` | Widget providers, the card factory, PendingIntent helper, boot/update and data-changed receivers |
+| `widget/` | Widget providers, the card factory, hand-off activity, PendingIntent helper, boot/update and data-changed receivers |
 | `ui/` | Control-panel activity and the per-widget setup screen |
 
 ## Requirements
 
 - Android 8.0+ (minSdk 26, targetSdk 37). The full-width title fix targets Android 12+.
-- The customized Aftergleam fork installed first. The official app does not expose this API.
+- The customized Aftergleam fork installed first. The official app does not expose this API. The Digest tile's *Downloaded* mode also needs a fork build that serves `v1/downloaded`; older builds show "UPDATE AFTERGLEAM FORK".
 - Both APKs signed with the same certificate (see below).
 
 ## Signing is required for IPC

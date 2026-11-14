@@ -13,7 +13,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
-import com.placeholder2312.researchwidgets.data.AftergleamLinks
 import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
@@ -113,8 +112,8 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             views.setRemoteAdapter(R.id.paper_stack, service)
             views.setEmptyView(R.id.paper_stack, R.id.empty_state)
 
-            // Taps go straight to Aftergleam's paper-open endpoint; each card adds its paper id.
-            val template = PendingIntents.activity(context, 10000 + id, AftergleamLinks.openPaperTemplate(), mutable = true)
+            // Taps go to a tiny hand-off activity; each card adds its paper id.
+            val template = PendingIntents.activity(context, 10000 + id, Intent(context, OpenInAftergleamActivity::class.java), mutable = true)
             views.setPendingIntentTemplate(R.id.paper_stack, template)
 
             // No setDisplayedChild: the stack keeps whichever paper the user swiped to across refreshes.
