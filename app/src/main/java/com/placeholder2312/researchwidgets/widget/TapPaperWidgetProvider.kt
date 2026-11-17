@@ -72,7 +72,7 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
 
         private const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
         private const val LINE_HEIGHT_FACTOR = 1.3f
-        private const val MAX_DOTS = 7
+        private const val MAX_DOTS = PaperDots.MAX_DOTS
         private const val RAIL_GAP_DP = 5
         private const val RAIL_DOT_STEP_DP = 9 // 4dp dot + 5dp gap
         private const val RAIL_CORNER_CLEARANCE_DP = 12 // keeps the rail off the rounded corners
@@ -80,9 +80,6 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
         private const val NEXT_ZONE_MIN_DP = 32f
         private const val NEXT_ZONE_MAX_DP = 56f
 
-        private val DOT_IDS = intArrayOf(
-            R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6
-        )
 
         /** Current widget size in dp: portrait is (min width, max height), landscape is (max width, min height). */
         internal fun sizeDp(context: Context, options: Bundle): Pair<Int, Int> {
@@ -302,24 +299,7 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
          * red dot never claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
          */
         private fun bindDots(views: RemoteViews, position: Int, count: Int, visible: Int) {
-            val active = if (count <= visible) {
-                position
-            } else {
-                Math.round(position * (visible - 1).toFloat() / (count - 1))
-            }
-            // Reversed: the red dot starts on the last dot and moves toward the first as papers advance.
-            val shown = visible - 1 - active
-            DOT_IDS.forEachIndexed { slot, viewId ->
-                if (slot < visible) {
-                    views.setViewVisibility(viewId, View.VISIBLE)
-                    views.setImageViewResource(
-                        viewId,
-                        if (slot == shown) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
-                    )
-                } else {
-                    views.setViewVisibility(viewId, View.GONE)
-                }
-            }
+            PaperDots.bind(views, position, count, visible)
         }
     }
 }

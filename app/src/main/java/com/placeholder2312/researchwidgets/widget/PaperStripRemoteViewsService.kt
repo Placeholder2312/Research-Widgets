@@ -156,24 +156,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
          * claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
          */
         private fun bindDots(views: RemoteViews, position: Int, count: Int, visible: Int) {
-            val active = if (count <= visible) {
-                position
-            } else {
-                Math.round(position * (visible - 1).toFloat() / (count - 1))
-            }
-            // Reversed: the red dot starts on the last dot and moves toward the first as papers advance.
-            val shown = visible - 1 - active
-            DOT_IDS.forEachIndexed { slot, viewId ->
-                if (slot < visible) {
-                    views.setViewVisibility(viewId, View.VISIBLE)
-                    views.setImageViewResource(
-                        viewId,
-                        if (slot == shown) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
-                    )
-                } else {
-                    views.setViewVisibility(viewId, View.GONE)
-                }
-            }
+            PaperDots.bind(views, position, count, visible)
         }
 
         override fun getLoadingView(): RemoteViews? = null
@@ -189,13 +172,10 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
     private companion object {
         const val DOT_BLOCK_DP = 14 // 6dp dot + 8dp margin
         const val LINE_HEIGHT_FACTOR = 1.3f
-        const val MAX_DOTS = 7
+        const val MAX_DOTS = PaperDots.MAX_DOTS
         const val RAIL_GAP_DP = 5
         const val RAIL_DOT_STEP_DP = 9 // 4dp dot + 5dp gap
         const val RAIL_CORNER_CLEARANCE_DP = 12 // keeps the rail off the rounded corners
         const val COUNTER_BLOCK_DP = 16 // 10sp mono line + 6dp margin
-        val DOT_IDS = intArrayOf(
-            R.id.dot_0, R.id.dot_1, R.id.dot_2, R.id.dot_3, R.id.dot_4, R.id.dot_5, R.id.dot_6
-        )
     }
 }
