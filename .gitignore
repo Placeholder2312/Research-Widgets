@@ -1,0 +1,31 @@
+# Gradle caches and generated build output
+.gradle/
+**/build/
+
+# Android Studio and local machine configuration
+.idea/
+*.iml
+local.properties
+
+# Local signing material — never commit private keys or keystores
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+
+# Generated Android packages and native build output
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Operating-system noise
+.DS_Store
+Thumbs.db
