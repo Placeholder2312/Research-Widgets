@@ -33,7 +33,7 @@ Both strips can show the **Recommended** digest or your **Saved** papers, chosen
 - **Bottom**: position dots under the title.
 - **Side**: a slim vertical dot rail on the right edge, with a `03/12` counter under the title.
 
-The current paper is the red dot. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first dot = first paper, last dot = last paper) and the counter gives the exact position.
+The current paper is the red dot. The order is reversed: the first paper is the last dot, and the red dot moves toward the first dot as you advance. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first paper = last dot, last paper = first dot) and the counter gives the exact position.
 
 The look follows Nothing "Classic": light or dark from the system, monospace caps for labels, light sans-serif titles, red `#D71921` as the only accent and a 28dp card radius.
 
@@ -97,7 +97,7 @@ flowchart LR
 
 Design notes:
 
-- **No network, no polling.** Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. Provider reads are cached for a few seconds so a widget and its adapter share one query.
+- **No network, no polling.** Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. One `FeedPass` is shared across all widget providers for that broadcast, so each feed is queried at most once; adapter reloads reuse the short-lived provider cache. Resize-only updates reuse recent reads.
 - **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ changed how a `PendingIntent` creator lends launch rights. Taps therefore go to a tiny translucent hand-off activity that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege.
 - **Full-width cards in `StackView`.** `StackView` measures cards with `AT_MOST` and parks back cards in the other 10% of its size. On Android 12+ the provider enlarges the stack to `widget / 0.9`, anchors it bottom-start, clips the back cards and sizes every card explicitly.
 - **Layout fitting.** Title size comes from width tiers; the number of title lines (2, 3 or 5, via separate layouts) comes from the widget height after reserving space for dots or the counter. Bottom and Side each have their own layouts.
@@ -131,7 +131,7 @@ The APK is written to `app/build/outputs/apk/debug/`. Prebuilt, signed debug APK
 
 **CI.** GitHub Actions is manual-only (`workflow_dispatch`). It validates the shared keystore from repository secrets, builds, runs the unit tests, verifies the APK signature and publishes the APK to Releases.
 
-**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore), and a contract test that pins the package, permission, URIs, columns and intent values to the fork's v1 API.
+**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore), the Aftergleam v1 IPC contract, and `FeedPass` query deduplication across repeated reads in one refresh pass.
 
 ## Aftergleam fork compatibility
 
@@ -151,4 +151,6 @@ Both apps must be installed with the same signing certificate, and both reposito
 
 ## Status
 
-Builds and unit tests pass in CI. Taps, swipe and both looks still need confirmation on physical devices, because launcher hosts differ. See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for the phased plan and what is verified.
+**Source version:** 1.10.2 (versionCode 18).
+
+The latest source includes the shared feed-read pass and the reversed red position indicator on both strip widgets. The 1.10.2 changes have **not yet been compiled or tested**. The GitHub Actions build is manual-only, so run it from the Actions tab before treating this revision as a verified APK or publishing it. Taps, swipe and both looks still need confirmation on physical devices because launcher hosts differ. See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for the phased plan and what is verified.
