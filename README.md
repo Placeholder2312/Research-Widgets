@@ -33,7 +33,7 @@ Both strips can show the **Recommended** digest or your **Saved** papers, chosen
 - **Bottom**: position dots under the title.
 - **Side**: a slim vertical dot rail on the right edge, with a `03/12` counter under the title.
 
-The current paper is the red dot. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first dot = first paper, last dot = last paper) and the counter gives the exact position.
+The current paper is the red dot. The order is reversed: the first paper is the last dot, and the red dot moves toward the first dot as you advance. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first paper = last dot, last paper = first dot) and the counter gives the exact position.
 
 The look follows Nothing "Classic": light or dark from the system, monospace caps for labels, light sans-serif titles, red `#D71921` as the only accent and a 28dp card radius.
 

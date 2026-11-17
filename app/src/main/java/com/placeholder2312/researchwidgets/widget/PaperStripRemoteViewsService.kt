@@ -152,7 +152,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
 
         /**
          * Position meter. Up to [MAX_DOTS] papers get one dot each; with more papers the fixed set of dots
-         * (a row, or a vertical rail) is a proportional meter (first dot = first paper, last dot = last paper), so the red dot never
+         * (a row, or a vertical rail) is a proportional meter (reversed: first paper = last dot, last paper = first dot), so the red dot never
          * claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
          */
         private fun bindDots(views: RemoteViews, position: Int, count: Int, visible: Int) {
@@ -161,12 +161,14 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
             } else {
                 Math.round(position * (visible - 1).toFloat() / (count - 1))
             }
+            // Reversed: the red dot starts on the last dot and moves toward the first as papers advance.
+            val shown = visible - 1 - active
             DOT_IDS.forEachIndexed { slot, viewId ->
                 if (slot < visible) {
                     views.setViewVisibility(viewId, View.VISIBLE)
                     views.setImageViewResource(
                         viewId,
-                        if (slot == active) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
+                        if (slot == shown) R.drawable.nothing_dot_red else R.drawable.nothing_dot_off
                     )
                 } else {
                     views.setViewVisibility(viewId, View.GONE)
