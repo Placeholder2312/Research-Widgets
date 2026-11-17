@@ -12,8 +12,8 @@ android {
         applicationId = "com.placeholder2312.researchwidgets"
         minSdk = 26
         targetSdk = 37
-        versionCode = 16
-        versionName = "1.10.0"
+        versionCode = 17
+        versionName = "1.10.1"
     }
     signingConfigs {
         if (sharedStore != null) {

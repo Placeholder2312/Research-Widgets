@@ -40,11 +40,12 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        ids.forEach { updateWidget(context, manager, it) }
+        val pass = FeedPass(context)
+        ids.forEach { updateWidget(context, manager, it, pass) }
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
-        updateWidget(context, manager, id, fresh = false)
+        updateWidget(context, manager, id, FeedPass(context, fresh = false))
     }
 
     override fun onDeleted(context: Context, ids: IntArray) {
@@ -97,10 +98,12 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
             return width.coerceAtLeast(1) to height.coerceAtLeast(1)
         }
 
-        fun refreshAll(context: Context) {
+        fun refreshAll(context: Context) = refreshAll(context, FeedPass(context))
+
+        internal fun refreshAll(context: Context, pass: FeedPass) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, TapPaperWidgetProvider::class.java))
-                .forEach { updateWidget(context, manager, it) }
+                .forEach { updateWidget(context, manager, it, pass) }
         }
 
         fun updateWidget(context: Context, id: Int) {
@@ -118,14 +121,14 @@ class TapPaperWidgetProvider : AppWidgetProvider() {
             if (count > 1) {
                 WidgetPreferences.setIndex(context, id, (WidgetPreferences.index(context, id) + 1) % count)
             }
-            updateWidget(context, manager, id, fresh = false)
+            updateWidget(context, manager, id, FeedPass(context, fresh = false))
         }
 
-        private fun updateWidget(context: Context, manager: AppWidgetManager, id: Int, fresh: Boolean = true) {
+        private fun updateWidget(context: Context, manager: AppWidgetManager, id: Int, pass: FeedPass = FeedPass(context)) {
             if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
 
             val mode = WidgetPreferences.mode(context, id)
-            val result = if (fresh) PaperProviderClient.read(context, mode) else PaperProviderClient.recent(context, mode)
+            val result = pass.read(mode)
             val (width, height) = sizeDp(context, manager.getAppWidgetOptions(id))
 
             val views = if (!result.connected || result.papers.isEmpty()) {

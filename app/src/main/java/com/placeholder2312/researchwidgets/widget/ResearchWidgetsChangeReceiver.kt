@@ -9,9 +9,11 @@ import com.placeholder2312.researchwidgets.data.AftergleamContract
 class ResearchWidgetsChangeReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == AftergleamContract.ACTION_DATA_CHANGED) {
-            PaperStripWidgetProvider.refreshAll(context)
-            TapPaperWidgetProvider.refreshAll(context)
-            DigestTileWidgetProvider.refreshAll(context)
+            // One pass: each feed is queried once and shared by every widget.
+            val pass = FeedPass(context)
+            PaperStripWidgetProvider.refreshAll(context, pass)
+            TapPaperWidgetProvider.refreshAll(context, pass)
+            DigestTileWidgetProvider.refreshAll(context, pass)
         }
     }
 }

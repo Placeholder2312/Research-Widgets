@@ -11,7 +11,6 @@ import com.placeholder2312.researchwidgets.R
 import com.placeholder2312.researchwidgets.data.AftergleamContract
 import com.placeholder2312.researchwidgets.data.DigestMode
 import com.placeholder2312.researchwidgets.data.FeedMode
-import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.ProviderState
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
@@ -21,11 +20,13 @@ import com.placeholder2312.researchwidgets.data.WidgetPreferences
  */
 class DigestTileWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, appWidgetIds: IntArray) {
-        appWidgetIds.forEach { update(context, manager, it) }
+        val pass = FeedPass(context)
+        appWidgetIds.forEach { update(context, manager, it, pass) }
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
-        update(context, manager, id)
+        // Resizing fires this repeatedly and the counts have not changed, so reuse a recent read.
+        update(context, manager, id, FeedPass(context, fresh = false))
     }
 
     override fun onDeleted(context: Context, ids: IntArray) {
@@ -43,18 +44,20 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
     companion object {
         private const val REQUEST_BASE = 30000
 
-        fun refreshAll(context: Context) {
+        fun refreshAll(context: Context) = refreshAll(context, FeedPass(context))
+
+        internal fun refreshAll(context: Context, pass: FeedPass) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, DigestTileWidgetProvider::class.java))
-                .forEach { update(context, manager, it) }
+                .forEach { update(context, manager, it, pass) }
         }
 
         fun updateWidget(context: Context, id: Int) = update(context, AppWidgetManager.getInstance(context), id)
 
-        private fun update(context: Context, manager: AppWidgetManager, id: Int) {
+        private fun update(context: Context, manager: AppWidgetManager, id: Int, pass: FeedPass = FeedPass(context)) {
             if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
             val mode = WidgetPreferences.digestMode(context, id)
-            val today = PaperProviderClient.read(context, FeedMode.RECOMMENDED)
+            val today = pass.read(FeedMode.RECOMMENDED)
             val views = RemoteViews(context.packageName, R.layout.widget_digest_tile)
 
             val description: String
@@ -69,7 +72,7 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
                 show(views, tag = "TODAY", big = "--", label = label, footer = "")
                 description = "$label. Open Aftergleam."
             } else if (mode == DigestMode.DOWNLOADED) {
-                val downloaded = PaperProviderClient.read(context, FeedMode.DOWNLOADED)
+                val downloaded = pass.read(FeedMode.DOWNLOADED)
                 if (downloaded.connected) {
                     val count = downloaded.papers.size
                     show(views, "OFFLINE", "%02d".format(count), if (count == 1) "PDF ON DEVICE" else "PDFS ON DEVICE", "TODAY %02d".format(today.papers.size))
@@ -82,7 +85,7 @@ class DigestTileWidgetProvider : AppWidgetProvider() {
                 }
             } else {
                 val count = today.papers.size
-                val saved = PaperProviderClient.read(context, FeedMode.SAVED)
+                val saved = pass.read(FeedMode.SAVED)
                 val savedCount = if (saved.connected) saved.papers.size else 0
                 show(views, "TODAY", "%02d".format(count), if (count == 1) "PAPER IN DIGEST" else "PAPERS IN DIGEST", "SAVED %02d".format(savedCount))
                 description = "$count papers in today's digest, $savedCount saved. Open Aftergleam."

@@ -13,7 +13,6 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.placeholder2312.researchwidgets.R
-import com.placeholder2312.researchwidgets.data.PaperProviderClient
 import com.placeholder2312.researchwidgets.data.WidgetPreferences
 
 /**
@@ -22,11 +21,13 @@ import com.placeholder2312.researchwidgets.data.WidgetPreferences
  */
 class PaperStripWidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        ids.forEach { updateWidget(context, manager, it) }
+        val pass = FeedPass(context)
+        ids.forEach { updateWidget(context, manager, it, pass) }
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
-        updateWidget(context, manager, id)
+        // Resizing fires this repeatedly; the size is all that changed, so reuse a recent read.
+        updateWidget(context, manager, id, FeedPass(context, fresh = false))
     }
 
     override fun onDeleted(context: Context, ids: IntArray) {
@@ -62,21 +63,23 @@ class PaperStripWidgetProvider : AppWidgetProvider() {
             return width.coerceAtLeast(1) to height.coerceAtLeast(1)
         }
 
-        fun refreshAll(context: Context) {
+        fun refreshAll(context: Context) = refreshAll(context, FeedPass(context))
+
+        internal fun refreshAll(context: Context, pass: FeedPass) {
             val manager = AppWidgetManager.getInstance(context)
             manager.getAppWidgetIds(ComponentName(context, PaperStripWidgetProvider::class.java))
-                .forEach { updateWidget(context, manager, it) }
+                .forEach { updateWidget(context, manager, it, pass) }
         }
 
         fun updateWidget(context: Context, id: Int) {
             updateWidget(context, AppWidgetManager.getInstance(context), id)
         }
 
-        private fun updateWidget(context: Context, manager: AppWidgetManager, id: Int) {
+        private fun updateWidget(context: Context, manager: AppWidgetManager, id: Int, pass: FeedPass = FeedPass(context)) {
             if (id == AppWidgetManager.INVALID_APPWIDGET_ID) return
 
             val mode = WidgetPreferences.mode(context, id)
-            val result = PaperProviderClient.read(context, mode)
+            val result = pass.read(mode)
             val views = RemoteViews(context.packageName, R.layout.widget_paper_strip)
             views.setTextViewText(
                 R.id.empty_text,
