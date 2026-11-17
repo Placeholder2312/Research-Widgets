@@ -12,7 +12,7 @@ Nothing-style Android home-screen widgets for your research-paper feed. They are
 - [Widgets](#widgets)
 - [Quick start](#quick-start)
 - [Troubleshooting](#troubleshooting)
-- [How it works](#how-it-works)
+- [Architecture](#architecture)
 - [Requirements](#requirements)
 - [Signing](#signing-is-required-for-ipc)
 - [Build, CI and tests](#build-ci-and-tests)
@@ -67,42 +67,11 @@ The swipe strip is built on Android's `StackView`, and the No Swipe strip on ord
 - Test button works, no widget works: the launcher-to-app hand-off is blocked. Capture logcat while tapping (`adb logcat -s ActivityTaskManager AppWidgetHostView`) and look for `Background activity launch blocked!`.
 - Test button fails: the problem is in Aftergleam or signing, not the widgets.
 
-## How it works
+## Architecture
 
-```mermaid
-flowchart LR
-    A[Aftergleam fork<br/>ContentProvider] -- signature permission --> C[PaperProviderClient]
-    A -- data-changed broadcast --> R[ResearchWidgetsChangeReceiver]
-    R --> P[PaperStripWidgetProvider]
-    R --> T[TapPaperWidgetProvider]
-    R --> D[DigestTileWidgetProvider]
-    C --> P
-    C --> T
-    C --> D
-    P -- adapter + template click --> S[StackView]
-    C --> F[PaperStripRemoteViewsService<br/>RemoteViewsFactory]
-    F -- one card per paper --> S
-    T -- plain RemoteViews + direct clicks --> W[Paper Strip, No Swipe]
-    S -- tap: PendingIntent + paper id --> O[OpenInAftergleamActivity<br/>hand-off]
-    W -- tap paper --> O
-    D -- tap --> O
-    O --> A
-```
+The companion reads paper metadata from Aftergleam's signature-protected provider and refreshes its widgets when Aftergleam sends a protected data-changed broadcast. The swipe strip uses Android `StackView`; the No Swipe strip uses plain `RemoteViews`; the Digest tile shows local feed counts. A shared `FeedPass` prevents redundant feed queries during a single refresh broadcast.
 
-| Package | Role |
-| --- | --- |
-| `data/` | Provider contract, read-only client (never throws; returns a state and message), per-widget preferences |
-| `widget/` | Widget providers, the card factory, hand-off activity, `PendingIntent` helper, boot and data-changed receivers |
-| `ui/` | Control-panel activity and the per-widget setup screens |
-
-Design notes:
-
-- **No network, no polling.** Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. One `FeedPass` is shared across all widget providers for that broadcast, so each feed is queried at most once; adapter reloads reuse the short-lived provider cache. Resize-only updates reuse recent reads.
-- **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ changed how a `PendingIntent` creator lends launch rights. Taps therefore go to a tiny translucent hand-off activity that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege.
-- **Full-width cards in `StackView`.** `StackView` measures cards with `AT_MOST` and parks back cards in the other 10% of its size. On Android 12+ the provider enlarges the stack to `widget / 0.9`, anchors it bottom-start, clips the back cards and sizes every card explicitly.
-- **Layout fitting.** Title size comes from width tiers; the number of title lines (2, 3 or 5, via separate layouts) comes from the widget height after reserving space for dots or the counter. Bottom and Side each have their own layouts.
-- **Honest position indicator.** The dots never show a position the widget isn't at, and the screen-reader description says "Paper 3 of 12".
-- **Dependency-free.** Plain Android SDK, no third-party runtime libraries.
+The implementation is split by responsibility: `data/` contains the provider contract and client, `ui/` contains the app and widget setup screens, and `widget/` contains widget providers and their Android lifecycle/hand-off helpers. The data flow and component details are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Requirements
 
