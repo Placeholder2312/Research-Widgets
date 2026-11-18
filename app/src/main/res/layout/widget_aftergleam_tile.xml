@@ -14,11 +14,11 @@
         android:layout_gravity="top|start"
         android:orientation="horizontal">
 
-        <ImageView android:layout_width="5dp" android:layout_height="5dp" android:layout_marginEnd="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:layout_width="5dp" android:layout_height="5dp" android:layout_marginEnd="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:layout_width="5dp" android:layout_height="5dp" android:layout_marginEnd="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
-        <ImageView android:layout_width="5dp" android:layout_height="5dp" android:layout_marginEnd="4dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
-        <ImageView android:layout_width="5dp" android:layout_height="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_red" />
+        <ImageView android:layout_width="6dp" android:layout_height="6dp" android:layout_marginEnd="5dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
+        <ImageView android:layout_width="6dp" android:layout_height="6dp" android:importantForAccessibility="no" android:src="@drawable/nothing_dot_off" />
     </LinearLayout>
 
     <ImageView
@@ -40,5 +40,5 @@
         android:letterSpacing="0.14"
         android:text="AFTERGLEAM"
         android:textColor="@color/nothing_muted"
-        android:textSize="9sp" />
+        android:textSize="10sp" />
 </FrameLayout>
