@@ -10,6 +10,7 @@ Nothing-style Android home-screen widgets for your research-paper feed. They are
 ## Contents
 
 - [Widgets](#widgets)
+- [Look and theme](#look-and-theme)
 - [Quick start](#quick-start)
 - [Troubleshooting](#troubleshooting)
 - [How it works](#how-it-works)
@@ -33,9 +34,7 @@ Both strips can show the **Recommended** digest or your **Saved** papers, chosen
 - **Bottom**: position dots under the title.
 - **Side**: a slim vertical dot rail on the right edge, with a `03/12` counter under the title.
 
-The current paper is the red dot. The order is reversed: the first paper is the last dot, and the red dot moves toward the first dot as you advance. With up to 7 papers each gets its own dot; beyond that the dots become a proportional meter (first paper = last dot, last paper = first dot) and the counter gives the exact position.
-
-The look follows Nothing "Classic": light or dark from the system, monospace caps for labels, light sans-serif titles, red `#D71921` as the only accent and a 28dp card radius.
+The current paper is the red dot, and the order is reversed: the first paper is the **last** dot, and the red dot moves toward the first dot as you advance. There are at most 7 dots (a short Side widget may fit fewer). With fewer papers than dots, each paper gets its own dot; with more, the dots become a proportional meter and the counter gives the exact position.
 
 The app itself is a small control panel with connection status, add buttons, placed-widget counts, a refresh button and a version label.
 
@@ -43,10 +42,19 @@ The app itself is a small control panel with connection status, add buttons, pla
 
 The swipe strip is built on Android's `StackView`, and the No Swipe strip on ordinary `RemoteViews`. Launchers differ in how they deliver taps from collection widgets, so if taps on the swipe strip do nothing on your launcher, use **Paper Strip (No Swipe)**. Both are kept so you can compare them side by side.
 
+## Look and theme
+
+All widgets follow Nothing "Classic" and draw from one shared set of `nothing_*` colour tokens, with matching light and dark sets that follow the system theme: monospace caps with letter spacing for labels, light sans-serif titles, red `#D71921` as the only accent, and a 28dp card corner radius. No widget hard-codes a colour.
+
+Two things differ on purpose:
+
+- The **Digest tile** is an inverted card (black in light mode, near-white in dark mode) so the big number stands out.
+- The **Aftergleam tile** shows the green Aftergleam logo, which is legible on both card colours.
+
 ## Quick start
 
 1. Install the **Aftergleam fork** first ([Aftergleam-For-Widgets](https://github.com/Placeholder2312/Aftergleam-For-Widgets)), then open it once so it builds today's digest.
-2. Install the newest **Research Widgets** APK from [GitHub Releases](https://github.com/Placeholder2312/Research-Widgets/releases). Both APKs must be signed with the same certificate (see [Signing](#signing-is-required-for-ipc)).
+2. Install the newest **Research Widgets** APK from [GitHub Releases](https://github.com/Placeholder2312/Research-Widgets/releases). Both APKs must be signed with the same certificate (see [Signing](#signing-is-required-for-ipc)). The newest release can be older than the source: compare the version label in the app with the [Status](#status) section.
 3. Open Research Widgets. The status dot turns red when it can read Aftergleam.
 4. Tap an **Add** button, or add a widget from your launcher's widget picker.
 5. Pick a feed and a look when the setup screen appears.
@@ -97,7 +105,7 @@ flowchart LR
 
 Design notes:
 
-- **No network, no polling.** Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. One `FeedPass` is shared across all widget providers for that broadcast, so each feed is queried at most once; adapter reloads reuse the short-lived provider cache. Resize-only updates reuse recent reads.
+- **No network, no polling.** The app declares no internet permission. Papers come from a read-only `ContentProvider` guarded by a signature permission. Aftergleam sends a protected change broadcast and the widgets re-query. One `FeedPass` is shared across all widget providers for that broadcast, so each feed is queried at most once; adapter reloads reuse the short-lived provider cache. Resize-only updates reuse recent reads.
 - **Reliable taps.** Android can silently block one app launching another from a window that isn't visible yet, and Android 15+ changed how a `PendingIntent` creator lends launch rights. Taps therefore go to a tiny translucent hand-off activity that opens Aftergleam from `onResume`, once its window is up, and the `PendingIntent` opts in to the creator launch privilege.
 - **Full-width cards in `StackView`.** `StackView` measures cards with `AT_MOST` and parks back cards in the other 10% of its size. On Android 12+ the provider enlarges the stack to `widget / 0.9`, anchors it bottom-start, clips the back cards and sizes every card explicitly.
 - **Layout fitting.** Title size comes from width tiers; the number of title lines (2, 3 or 5, via separate layouts) comes from the widget height after reserving space for dots or the counter. Bottom and Side each have their own layouts.
@@ -131,7 +139,7 @@ The APK is written to `app/build/outputs/apk/debug/`. Prebuilt, signed debug APK
 
 **CI.** GitHub Actions is manual-only (`workflow_dispatch`). It validates the shared keystore from repository secrets, builds, runs the unit tests, verifies the APK signature and publishes the APK to Releases.
 
-**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore), the Aftergleam v1 IPC contract, and `FeedPass` query deduplication across repeated reads in one refresh pass.
+**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore) and the Aftergleam v1 IPC contract. Plain JUnit tests cover `FeedPass` (each feed is queried once per refresh pass; resizing never forces a query) and `PaperDots` (which dot is red, including the reversed order and the proportional meter).
 
 ## Aftergleam fork compatibility
 
@@ -151,6 +159,23 @@ Both apps must be installed with the same signing certificate, and both reposito
 
 ## Status
 
-**Source version:** 1.10.2 (versionCode 18).
+**Source version:** 1.10.4 (versionCode 20). The newest published APK may be older, so check [Releases](https://github.com/Placeholder2312/Research-Widgets/releases) against this number.
 
-The latest source includes the shared feed-read pass and the reversed red position indicator on both strip widgets. The 1.10.2 changes have **not yet been compiled or tested**. The GitHub Actions build is manual-only, so run it from the Actions tab before treating this revision as a verified APK or publishing it. Taps, swipe and both looks still need confirmation on physical devices because launcher hosts differ. See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for the phased plan and what is verified.
+**Checked so far**
+
+- All Kotlin sources compile against the Android 36 SDK.
+- The `FeedPass` and `PaperDots` unit tests pass on the JVM.
+
+**Not yet checked for this version**
+
+- The Gradle build, the Robolectric tests, resource linking and lint. CI is manual-only, so run it from the Actions tab before treating this revision as a verified APK or publishing it.
+- Physical devices: taps, swipe, both looks, the dot direction, and the Aftergleam tile in light and dark mode. Launcher hosts differ, so these need confirming on your own phone.
+
+**Known limits**
+
+- It needs the customized Aftergleam fork and the same signing certificate on both apps.
+- Taps on the swipe strip depend on the launcher; **Paper Strip (No Swipe)** is the fallback.
+- The full-width title fix applies on Android 12+ only.
+- Widgets refresh when Aftergleam sends its change broadcast, on boot or app update, and from the control panel's refresh button. There is no periodic refresh.
+
+See [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for the phased plan and what is verified.
