@@ -159,17 +159,17 @@ Both apps must be installed with the same signing certificate, and both reposito
 
 ## Status
 
-**Source version:** 1.10.5 (versionCode 21). The newest published APK may be older, so check [Releases](https://github.com/Placeholder2312/Research-Widgets/releases) against this number.
+**Source version:** 1.10.5 (versionCode 21). The matching APK is [research-widgets-v1.10.5-build-51](https://github.com/Placeholder2312/Research-Widgets/releases/tag/research-widgets-v1.10.5-build-51). GitHub lists CI builds as pre-releases, so scroll past any older "latest" entry on the [Releases](https://github.com/Placeholder2312/Research-Widgets/releases) page.
 
 **Checked so far**
 
-- All Kotlin sources compile against the Android 36 SDK.
-- The `FeedPass` and `PaperDots` unit tests pass on the JVM.
+- CI run #51 passed for this version: the Gradle build and unit tests (Robolectric included), resource linking, shared-certificate APK signature verification, and publishing.
+- All Kotlin sources also compile against the Android 36 SDK outside CI, and the `FeedPass` and `PaperDots` unit tests pass on the JVM.
 
 **Not yet checked for this version**
 
-- The Gradle build, the Robolectric tests, resource linking and lint. CI is manual-only, so run it from the Actions tab before treating this revision as a verified APK or publishing it.
-- Physical devices: taps, swipe, both looks, the dot direction, and the Aftergleam tile in light and dark mode. Launcher hosts differ, so these need confirming on your own phone.
+- Lint. CI does not run it.
+- Physical devices: taps, swipe, both looks, the dot order, and the Aftergleam tile in light and dark mode. Launcher hosts differ, so these need confirming on your own phone.
 
 **Known limits**
 
