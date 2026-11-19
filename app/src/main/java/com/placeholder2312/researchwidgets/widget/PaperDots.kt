@@ -13,9 +13,9 @@ internal object PaperDots {
     )
 
     /**
-     * Which of the [visible] dots is red for the paper at [position] of [count]. Reversed: the first paper is the
-     * last dot and the last paper is the first dot. Up to [visible] papers get one dot each; with more papers
-     * the dots are a proportional meter.
+     * Which of the [visible] dots is red for the paper at [position] of [count]. The first paper is the first dot
+     * (leftmost in a row, top of a rail) and the last paper is the last dot (rightmost, bottom). Up to [visible]
+     * papers get one dot each; with more papers the dots are a proportional meter.
      */
     fun litSlot(position: Int, count: Int, visible: Int): Int {
         val active = if (count <= visible) {
@@ -23,7 +23,7 @@ internal object PaperDots {
         } else {
             Math.round(position * (visible - 1).toFloat() / (count - 1))
         }
-        return visible - 1 - active
+        return active
     }
 
     fun bind(views: RemoteViews, position: Int, count: Int, visible: Int) {

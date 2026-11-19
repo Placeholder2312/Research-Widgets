@@ -152,7 +152,7 @@ class PaperStripRemoteViewsService : RemoteViewsService() {
 
         /**
          * Position meter. Up to [MAX_DOTS] papers get one dot each; with more papers the fixed set of dots
-         * (a row, or a vertical rail) is a proportional meter (reversed: first paper = last dot, last paper = first dot), so the red dot never
+         * (a row, or a vertical rail) is a proportional meter (first paper = first dot, last paper = last dot), so the red dot never
          * claims a position it isn't at. The exact "Paper X of N" is in the accessibility description.
          */
         private fun bindDots(views: RemoteViews, position: Int, count: Int, visible: Int) {

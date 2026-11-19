@@ -34,7 +34,7 @@ Both strips can show the **Recommended** digest or your **Saved** papers, chosen
 - **Bottom**: position dots under the title.
 - **Side**: a slim vertical dot rail on the right edge, with a `03/12` counter under the title.
 
-The current paper is the red dot, and the order is reversed: the first paper is the **last** dot, and the red dot moves toward the first dot as you advance. There are at most 7 dots (a short Side widget may fit fewer). With fewer papers than dots, each paper gets its own dot; with more, the dots become a proportional meter and the counter gives the exact position.
+The current paper is the red dot. The first paper is the first dot (leftmost in the Bottom look, top of the rail in the Side look) and the last paper is the last dot, so with 8 papers `1/8` is the leftmost dot and `8/8` the rightmost. There are at most 7 dots (a short Side widget may fit fewer). With fewer papers than dots, each paper gets its own dot; with more, the dots become a proportional meter and the counter gives the exact position.
 
 The app itself is a small control panel with connection status, add buttons, placed-widget counts, a refresh button and a version label.
 
@@ -139,7 +139,7 @@ The APK is written to `app/build/outputs/apk/debug/`. Prebuilt, signed debug APK
 
 **CI.** GitHub Actions is manual-only (`workflow_dispatch`). It validates the shared keystore from repository secrets, builds, runs the unit tests, verifies the APK signature and publishes the APK to Releases.
 
-**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore) and the Aftergleam v1 IPC contract. Plain JUnit tests cover `FeedPass` (each feed is queried once per refresh pass; resizing never forces a query) and `PaperDots` (which dot is red, including the reversed order and the proportional meter).
+**Tests.** Robolectric unit tests cover provider row mapping, graceful handling of a missing provider, per-widget feed and style storage (including widget restore) and the Aftergleam v1 IPC contract. Plain JUnit tests cover `FeedPass` (each feed is queried once per refresh pass; resizing never forces a query) and `PaperDots` (which dot is red, including first-to-last order and the proportional meter).
 
 ## Aftergleam fork compatibility
 
@@ -159,7 +159,7 @@ Both apps must be installed with the same signing certificate, and both reposito
 
 ## Status
 
-**Source version:** 1.10.4 (versionCode 20). The newest published APK may be older, so check [Releases](https://github.com/Placeholder2312/Research-Widgets/releases) against this number.
+**Source version:** 1.10.5 (versionCode 21). The newest published APK may be older, so check [Releases](https://github.com/Placeholder2312/Research-Widgets/releases) against this number.
 
 **Checked so far**
 
